@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 360" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad10" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b0f19" />
+      <stop offset="100%" stop-color="#111827" />
+    </linearGradient>
+    <linearGradient id="postfixGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e3a8a" />
+      <stop offset="100%" stop-color="#1e40af" />
+    </linearGradient>
+    <filter id="glowBlue10" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#3b82f6" flood-opacity="0.35" />
+    </filter>
+    <marker id="arrowBlue10" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#3b82f6" />
+    </marker>
+    <marker id="arrowPurple10" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#a855f7" />
+    </marker>
+  </defs>
+
+  <rect width="800" height="360" rx="16" fill="url(#bgGrad10)" stroke="#1e293b" stroke-width="1.5" />
+
+  <rect x="24" y="20" width="220" height="28" rx="6" fill="#1e293b" stroke="#334155" />
+  <text x="34" y="38" fill="#93c5fd" font-family="monospace" font-size="11" font-weight="700">POSTFIX &amp; DOVECOT MAIL STACK</text>
+  <text x="254" y="38" fill="#64748b" font-family="sans-serif" font-size="12">SMTP (587/25) · IMAPS (993) · Maildir Storage</text>
+
+  <!-- Left: Mail Clients (Thunderbird / Phones) -->
+  <g transform="translate(40, 85)">
+    <rect width="180" height="200" rx="12" fill="#0f172a" stroke="#334155" stroke-width="1.5" />
+    <text x="18" y="30" fill="#f8fafc" font-family="sans-serif" font-size="14" font-weight="700">Email Clients</text>
+    <text x="18" y="46" fill="#94a3b8" font-family="monospace" font-size="11">Outlook, Thunderbird</text>
+
+    <!-- Outbox sending -->
+    <rect x="14" y="65" width="152" height="48" rx="6" fill="#1e293b" />
+    <text x="22" y="85" fill="#38bdf8" font-family="sans-serif" font-size="11" font-weight="600">📤 Sending Email</text>
+    <text x="22" y="101" fill="#93c5fd" font-family="monospace" font-size="10">SMTP Port 587 (STARTTLS)</text>
+
+    <!-- Inbox receiving -->
+    <rect x="14" y="125" width="152" height="48" rx="6" fill="#1e293b" />
+    <text x="22" y="145" fill="#c084fc" font-family="sans-serif" font-size="11" font-weight="600">📥 Reading Mail</text>
+    <text x="22" y="161" fill="#e9d5ff" font-family="monospace" font-size="10">IMAPS Port 993 (SSL)</text>
+  </g>
+
+  <!-- Middle: Linux Mail Server (Postfix + Dovecot) -->
+  <g transform="translate(290, 75)" filter="url(#glowBlue10)">
+    <rect width="220" height="220" rx="14" fill="url(#postfixGrad)" stroke="#3b82f6" stroke-width="2" />
+    <text x="20" y="32" fill="#fff" font-family="sans-serif" font-size="16" font-weight="700">📧 Linux Mail Server</text>
+    <text x="20" y="48" fill="#bfdbfe" font-family="monospace" font-size="12">mail.yourdomain.com</text>
+
+    <!-- Postfix MTA -->
+    <rect x="16" y="65" width="188" height="60" rx="8" fill="#172554" stroke="#2563eb" />
+    <text x="26" y="85" fill="#60a5fa" font-family="sans-serif" font-size="12" font-weight="700">Postfix (MTA)</text>
+    <text x="26" y="100" fill="#bfdbfe" font-family="monospace" font-size="10">Ports 25 (MX) &amp; 587 (Submission)</text>
+    <text x="26" y="115" fill="#93c5fd" font-family="sans-serif" font-size="9">Handles routing, SPF &amp; spam reject</text>
+
+    <!-- Dovecot MDA -->
+    <rect x="16" y="135" width="188" height="60" rx="8" fill="#172554" stroke="#2563eb" />
+    <text x="26" y="155" fill="#a855f7" font-family="sans-serif" font-size="12" font-weight="700">Dovecot (MDA / IMAP)</text>
+    <text x="26" y="170" fill="#e9d5ff" font-family="monospace" font-size="10">Port 993 IMAPS · SASL Auth</text>
+    <text x="26" y="185" fill="#c084fc" font-family="sans-serif" font-size="9">Manages user inboxes &amp; folders</text>
+  </g>
+
+  <!-- Right: Storage & External Internet -->
+  <g transform="translate(580, 85)">
+    <rect width="180" height="200" rx="12" fill="#0f172a" stroke="#334155" stroke-width="1.5" />
+    <text x="18" y="30" fill="#f8fafc" font-family="sans-serif" font-size="14" font-weight="700">Maildir Storage</text>
+    <text x="18" y="46" fill="#94a3b8" font-family="monospace" font-size="11">~/Maildir/cur, /new</text>
+
+    <rect x="14" y="65" width="152" height="48" rx="6" fill="#1e293b" />
+    <text x="22" y="85" fill="#34d399" font-family="sans-serif" font-size="11" font-weight="600">📁 One File Per Mail</text>
+    <text x="22" y="101" fill="#94a3b8" font-family="monospace" font-size="10">Crash-safe Maildir format</text>
+
+    <rect x="14" y="125" width="152" height="48" rx="6" fill="#1e293b" />
+    <text x="22" y="145" fill="#fbbf24" font-family="sans-serif" font-size="11" font-weight="600">🛡️ DNS Records</text>
+    <text x="22" y="161" fill="#94a3b8" font-family="monospace" font-size="10">MX, SPF, DKIM, DMARC</text>
+  </g>
+
+  <!-- Connectors -->
+  <path d="M 220 135 L 282 135" stroke="#38bdf8" stroke-width="2.5" marker-end="url(#arrowBlue10)" />
+  <text x="251" y="127" fill="#93c5fd" font-family="monospace" font-size="9" text-anchor="middle">SMTP:587</text>
+
+  <path d="M 282 195 L 228 195" stroke="#a855f7" stroke-width="2.5" marker-end="url(#arrowPurple10)" />
+  <text x="255" y="210" fill="#c084fc" font-family="monospace" font-size="9" text-anchor="middle">IMAP:993</text>
+
+  <path d="M 510 160 L 572 160" stroke="#34d399" stroke-width="2.5" marker-end="url(#arrowBlue10)" />
+  <text x="541" y="151" fill="#34d399" font-family="monospace" font-size="9" text-anchor="middle">MAILDIR</text>
+
+  <!-- Legend -->
+  <g transform="translate(140, 320)">
+    <circle cx="10" cy="10" r="5" fill="#38bdf8" />
+    <text x="22" y="13" fill="#cbd5e1" font-family="sans-serif" font-size="11">Postfix receives &amp; sends SMTP</text>
+
+    <circle cx="280" cy="10" r="5" fill="#a855f7" />
+    <text x="292" y="13" fill="#cbd5e1" font-family="sans-serif" font-size="11">Dovecot lets clients fetch inbox via IMAP</text>
+  </g>
+</svg>

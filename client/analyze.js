@@ -1,0 +1,10 @@
+﻿import fs from 'fs';
+const content = fs.readFileSync('c:/Users/Admin/Downloads/Antoniano-ut-Project/client/src/components/AppHeader.jsx', 'utf8');
+console.log('Length:', content.length);
+console.log('Newlines:', content.split('\n').length - 1);
+console.log('Char 0:', JSON.stringify(content.charAt(0)));
+console.log('Char 1:', JSON.stringify(content.charAt(1)));
+console.log('Char 2:', JSON.stringify(content.charAt(2)));
+console.log('Char 3:', JSON.stringify(content.charAt(3)));
+console.log('Char 4:', JSON.stringify(content.charAt(4)));
+console.log('Char 5:', JSON.stringify(content.charAt(5)));

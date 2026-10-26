@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 360" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad11" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b0f19" />
+      <stop offset="100%" stop-color="#111827" />
+    </linearGradient>
+    <linearGradient id="ncGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7" />
+      <stop offset="100%" stop-color="#0369a1" />
+    </linearGradient>
+    <filter id="glowSky11" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#0284c7" flood-opacity="0.35" />
+    </filter>
+    <marker id="arrowSky11" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#38bdf8" />
+    </marker>
+    <marker id="arrowAmber11" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#fbbf24" />
+    </marker>
+  </defs>
+
+  <rect width="800" height="360" rx="16" fill="url(#bgGrad11)" stroke="#1e293b" stroke-width="1.5" />
+
+  <rect x="24" y="20" width="220" height="28" rx="6" fill="#1e293b" stroke="#334155" />
+  <text x="34" y="38" fill="#7dd3fc" font-family="monospace" font-size="11" font-weight="700">NEXTCLOUD PRIVATE CLOUD</text>
+  <text x="254" y="38" fill="#64748b" font-family="sans-serif" font-size="12">Self-Hosted Sync &amp; Share · PHP-FPM · Redis · DB</text>
+
+  <!-- Left: Sync Clients -->
+  <g transform="translate(40, 85)">
+    <rect width="180" height="200" rx="12" fill="#0f172a" stroke="#334155" stroke-width="1.5" />
+    <text x="18" y="30" fill="#f8fafc" font-family="sans-serif" font-size="14" font-weight="700">Client Interfaces</text>
+    <text x="18" y="46" fill="#94a3b8" font-family="monospace" font-size="11">Zero Third-Party Cloud</text>
+
+    <rect x="14" y="65" width="152" height="42" rx="6" fill="#1e293b" />
+    <text x="22" y="85" fill="#38bdf8" font-family="sans-serif" font-size="11" font-weight="600">🌐 Web Portal</text>
+    <text x="22" y="100" fill="#7dd3fc" font-family="monospace" font-size="10">https://cloud.lab.internal</text>
+
+    <rect x="14" y="118" width="152" height="42" rx="6" fill="#1e293b" />
+    <text x="22" y="138" fill="#a7f3d0" font-family="sans-serif" font-size="11" font-weight="600">📱 Mobile &amp; Desktop App</text>
+    <text x="22" y="153" fill="#94a3b8" font-family="monospace" font-size="10">Nextcloud Sync Engine</text>
+
+    <rect x="14" y="168" width="152" height="24" rx="4" fill="#1e293b" />
+    <text x="22" y="184" fill="#64748b" font-family="sans-serif" font-size="10">End-to-End Encryption</text>
+  </g>
+
+  <!-- Middle: Nextcloud Server Stack -->
+  <g transform="translate(290, 75)" filter="url(#glowSky11)">
+    <rect width="220" height="220" rx="14" fill="url(#ncGrad)" stroke="#38bdf8" stroke-width="2" />
+    <text x="20" y="32" fill="#fff" font-family="sans-serif" font-size="16" font-weight="700">☁️ Nextcloud Server</text>
+    <text x="20" y="48" fill="#e0f2fe" font-family="monospace" font-size="12">PHP 8.3 FPM + Nginx</text>
+
+    <!-- Nginx Proxy -->
+    <rect x="16" y="65" width="188" height="38" rx="6" fill="#0369a1" stroke="#0284c7" />
+    <text x="26" y="84" fill="#fff" font-family="sans-serif" font-size="11" font-weight="700">Nginx / SSL Offloader</text>
+    <text x="26" y="96" fill="#e0f2fe" font-family="monospace" font-size="9">WebDAV, CalDAV, CardDAV</text>
+
+    <!-- PHP Engine -->
+    <rect x="16" y="110" width="188" height="44" rx="6" fill="#0369a1" stroke="#0284c7" />
+    <text x="26" y="129" fill="#fff" font-family="sans-serif" font-size="11" font-weight="700">Nextcloud Core Engine</text>
+    <text x="26" y="145" fill="#bae6fd" font-family="sans-serif" font-size="10">File versions, sharing, users</text>
+
+    <!-- Redis Cache -->
+    <rect x="16" y="160" width="188" height="42" rx="6" fill="#0369a1" stroke="#0284c7" />
+    <text x="26" y="179" fill="#fde68a" font-family="sans-serif" font-size="11" font-weight="700">⚡ Redis In-Memory Cache</text>
+    <text x="26" y="193" fill="#e0f2fe" font-family="monospace" font-size="9">Transactional file locking</text>
+  </g>
+
+  <!-- Right: Database & Data Storage -->
+  <g transform="translate(580, 85)">
+    <rect width="180" height="200" rx="12" fill="#0f172a" stroke="#334155" stroke-width="1.5" />
+    <text x="18" y="30" fill="#f8fafc" font-family="sans-serif" font-size="14" font-weight="700">Data Persistence</text>
+    <text x="18" y="46" fill="#94a3b8" font-family="monospace" font-size="11">Separated Storage</text>
+
+    <rect x="14" y="65" width="152" height="50" rx="6" fill="#1e293b" />
+    <text x="22" y="85" fill="#fbbf24" font-family="sans-serif" font-size="11" font-weight="600">🗄️ MariaDB / Postgres</text>
+    <text x="22" y="103" fill="#94a3b8" font-family="monospace" font-size="10">User accounts, metadata</text>
+
+    <rect x="14" y="125" width="152" height="58" rx="6" fill="#1e293b" />
+    <text x="22" y="145" fill="#34d399" font-family="sans-serif" font-size="11" font-weight="600">📁 Data Directory</text>
+    <text x="22" y="161" fill="#a7f3d0" font-family="monospace" font-size="9">/var/www/nextcloud-data</text>
+    <text x="22" y="174" fill="#94a3b8" font-family="sans-serif" font-size="9">Protected outside webroot</text>
+  </g>
+
+  <!-- Connectors -->
+  <path d="M 220 160 L 282 160" stroke="#38bdf8" stroke-width="2.5" marker-end="url(#arrowSky11)" />
+  <text x="251" y="151" fill="#7dd3fc" font-family="monospace" font-size="9" text-anchor="middle">HTTPS</text>
+
+  <path d="M 510 160 L 572 160" stroke="#fbbf24" stroke-width="2.5" marker-end="url(#arrowAmber11)" />
+  <text x="541" y="151" fill="#fde68a" font-family="monospace" font-size="9" text-anchor="middle">STORAGE</text>
+
+  <!-- Legend -->
+  <g transform="translate(140, 320)">
+    <circle cx="10" cy="10" r="5" fill="#38bdf8" />
+    <text x="22" y="13" fill="#cbd5e1" font-family="sans-serif" font-size="11">Clients sync files and calendars over standard HTTPS</text>
+
+    <circle cx="390" cy="10" r="5" fill="#fbbf24" />
+    <text x="402" y="13" fill="#cbd5e1" font-family="sans-serif" font-size="11">Database stores user metadata while raw files reside on secure disk</text>
+  </g>
+</svg>

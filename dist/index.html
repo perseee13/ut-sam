@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ServerPath — Learn Linux Servers</title>
+<meta name="description" content="A free, self-paced learning path for anyone who wants to run and operate Linux servers: shell, files, permissions, systemd, networking, security and scripting.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230d1117'/%3E%3Ctext x='32' y='44' font-family='monospace' font-size='30' fill='%234ade80' text-anchor='middle'%3E%26gt;_%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" crossorigin href="/assets/index-Bccv1SDE.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">🐧</span><span class="brand-name">Linux <em>Servers</em></span></a>
+    <nav class="site-nav" aria-label="Main">
+      <a href="index.html" class="is-active" aria-current="page">Home</a>
+      <a href="squid-proxy.html">Squid Proxy</a>
+      <a href="/mqtt">MQTT</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero">
+    <div class="container hero-inner">
+      <div class="hero-copy">
+        <p class="kicker">Build / Deploy / Manage</p>
+        <h1>Linux Servers<br>for a <span class="accent">Stronger Web</span></h1>
+        <p class="lede">Power your projects, websites, and applications with reliable, secure, and high-performance Linux servers. Simple to manage. Built for what's next.</p>
+        <div class="hero-actions">
+          <a class="btn btn-ghost" href="squid-proxy.html">🦑 Start with Squid Proxy</a>
+        </div>
+        <p class="hero-note" id="hero-progress-note">Free · self-paced · no sign-up — progress is saved in your browser.</p>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <svg viewBox="0 0 560 400" preserveAspectRatio="xMidYMid slice">
+          <circle cx="400" cy="105" r="62" fill="#ffe9a8"/><circle cx="400" cy="105" r="86" fill="#ffedb8" opacity="0.45"/>
+          <g fill="#cfe1fb"><ellipse cx="120" cy="92" rx="52" ry="20"/><ellipse cx="160" cy="80" rx="40" ry="18"/><ellipse cx="455" cy="60" rx="44" ry="16"/></g>
+          <polygon points="40,300 170,150 300,300" fill="#b9cdf3"/><polygon points="120,300 170,150 220,300" fill="#dce7fb"/>
+          <polygon points="200,300 330,130 460,300" fill="#a9c1ec"/><polygon points="285,300 330,130 375,300" fill="#d5e2fa"/>
+          <ellipse cx="280" cy="330" rx="250" ry="52" fill="#8fa3c8"/><ellipse cx="280" cy="322" rx="250" ry="50" fill="#a9bcd9"/>
+          <rect x="330" y="120" width="95" height="180" rx="10" fill="#22344f" stroke="#101d33" stroke-width="4"/>
+          <rect x="340" y="134" width="75" height="18" rx="4" fill="#31496e"/><rect x="340" y="162" width="75" height="18" rx="4" fill="#31496e"/><rect x="340" y="190" width="75" height="18" rx="4" fill="#31496e"/><rect x="340" y="218" width="75" height="18" rx="4" fill="#31496e"/><rect x="340" y="246" width="75" height="18" rx="4" fill="#31496e"/><rect x="340" y="274" width="75" height="18" rx="4" fill="#31496e"/>
+          <rect x="425" y="140" width="95" height="170" rx="10" fill="#2b4062" stroke="#101d33" stroke-width="4"/>
+          <rect x="435" y="154" width="75" height="18" rx="4" fill="#3b557d"/><rect x="435" y="184" width="75" height="18" rx="4" fill="#3b557d"/><rect x="435" y="214" width="75" height="18" rx="4" fill="#3b557d"/><rect x="435" y="244" width="75" height="18" rx="4" fill="#3b557d"/>
+          <ellipse cx="215" cy="285" rx="52" ry="58" fill="#101d33"/><ellipse cx="215" cy="292" rx="34" ry="44" fill="#ffffff"/>
+          <circle cx="215" cy="238" r="30" fill="#101d33"/><ellipse cx="215" cy="244" rx="20" ry="22" fill="#ffffff"/>
+          <circle cx="206" cy="236" r="4.5" fill="#fff"/><circle cx="224" cy="236" r="4.5" fill="#fff"/>
+          <circle cx="206" cy="236" r="2" fill="#101d33"/><circle cx="224" cy="236" r="2" fill="#101d33"/>
+          <polygon points="215,242 206,250 224,250" fill="#f59e0b"/>
+          <ellipse cx="168" cy="286" rx="14" ry="24" fill="#f59e0b" transform="rotate(-18 168 286)"/>
+          <ellipse cx="262" cy="286" rx="14" ry="24" fill="#f59e0b" transform="rotate(18 262 286)"/>
+          <ellipse cx="198" cy="336" rx="14" ry="8" fill="#f59e0b"/><ellipse cx="232" cy="336" rx="14" ry="8" fill="#f59e0b"/>
+          <g fill="#4ade80"><ellipse cx="120" cy="300" rx="10" ry="22"/><ellipse cx="140" cy="305" rx="10" ry="18"/><ellipse cx="470" cy="300" rx="10" ry="22"/><ellipse cx="492" cy="305" rx="10" ry="18"/></g>
+        </svg>
+        <span class="hero-badge">Open Source.<br>Real Freedom.</span>
+        <div class="hero-mini-term">
+          <div class="term">
+            <div class="term-bar"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span><span class="term-title">user@server — bash</span></div>
+            <div class="term-body">
+              <p><span class="tprompt">user@server</span>:~$ sudo apt update</p>
+              <p><span class="tprompt">user@server</span>:~$ sudo apt upgrade</p>
+              <p><span class="tok">✓ Your server is running smoothly!</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-tight" id="features">
+    <div class="container">
+      <div class="feature-grid">
+        <div class="feature-card"><span class="feature-icon green" aria-hidden="true">🛡</span><h3>Secure by Design</h3><p>Keep your data and applications safe with the power and stability of Linux.</p></div>
+        <div class="feature-card"><span class="feature-icon violet" aria-hidden="true">⚡</span><h3>High Performance</h3><p>Handle more traffic and scale with confidence — no unnecessary overhead.</p></div>
+        <div class="feature-card"><span class="feature-icon blue" aria-hidden="true">⚙</span><h3>Full Control</h3><p>Customize, configure, and manage your server exactly how you want.</p></div>
+        <div class="feature-card"><span class="feature-icon orange" aria-hidden="true">☁</span><h3>Open Source</h3><p>A flexible and trusted platform backed by a global community.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-tight">
+    <div class="container">
+      <div class="stats" id="stats"></div>
+    </div>
+  </section>
+  <section class="section" id="freedom">
+    <div class="container freedom-inner">
+      <div class="freedom-copy">
+        <p class="kicker">Why Linux Servers?</p>
+        <h2>Freedom to Build<br>Without Limits</h2>
+        <p class="section-sub">From small personal projects to large-scale production environments, Linux servers give you the freedom, control, and reliability to build without limits.</p>
+        <div class="hero-actions">
+
+        </div>
+      </div>
+      <div class="freedom-term" aria-hidden="true">
+        <div class="term">
+          <div class="term-bar"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span><span class="term-title">user@server — bash</span></div>
+          <div class="term-body">
+            <p><span class="tprompt">user@server</span>:~$ sudo apt update</p>
+            <p><span class="tprompt">user@server</span>:~$ sudo apt upgrade</p>
+            <p><span class="tprompt">user@server</span>:~$ systemctl status nginx</p>
+            <p><span class="tok">✓ Your server is running smoothly!</span></p>
+          </div>
+        </div>
+        <p class="freedom-note">Small commands.<br>Big possibilities.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <p><span class="brand-mark small" aria-hidden="true">🐧</span> Linux Servers — freedom to build without limits.</p>
+    <nav aria-label="Footer">
+      <a href="index.html">Home</a>
+      <a href="squid-proxy.html">Squid Proxy</a>
+    </nav>
+  </div>
+</footer>
+
+<noscript><p class="noscript-note">This site renders lesson content with JavaScript. Please enable JavaScript to use the learning pages.</p></noscript>
+
+<script src="assets/js/lessons.js"></script>
+<script src="assets/js/data-squid.js"></script>
+<script src="assets/js/data-essentials.js"></script>
+<script src="assets/js/data-files.js"></script>
+<script src="assets/js/data-users.js"></script>
+<script src="assets/js/data-processes.js"></script>
+<script src="assets/js/data-network.js"></script>
+<script src="assets/js/data-security.js"></script>
+<script src="assets/js/data-scripting.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>

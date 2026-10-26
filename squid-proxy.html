@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Squid Proxy — ServerPath</title>
+<meta name="description" content="Your first topic: run a caching Squid forward proxy on Ubuntu — install, open it to your LAN, filter with ACLs and prove caching works.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230d1117'/%3E%3Ctext x='32' y='44' font-family='monospace' font-size='30' fill='%234ade80' text-anchor='middle'%3E%26gt;_%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/light-theme.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">🐧</span><span class="brand-name">Linux <em>Servers</em></span></a>
+    <nav class="site-nav" aria-label="Main">
+      <a href="index.html">Home</a>
+      <a href="squid-proxy.html" class="is-active" aria-current="page">Squid Proxy</a>
+      <a href="blank.html">Blank</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero">
+    <div class="container hero-inner">
+      <div class="hero-copy">
+        <p class="kicker">Your first topic</p>
+        <h1>🦑 Squid Proxy</h1>
+        <p class="lede">Run your first caching forward proxy: install Squid, open it to your LAN, filter sites with ACLs and speed up repeat visits with caching.</p>
+        <div class="hero-actions">
+          <a class="btn btn-ghost" href="#squid-lessons">Jump to Guide ↓</a>
+          <a class="btn btn-ghost" href="index.html#curriculum">All topics</a>
+        </div>
+        <p class="hero-note" id="squid-progress-note">Free · self-paced · no sign-up — progress is saved in your browser.</p>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="term">
+          <div class="term-bar"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span><span class="term-title">squid box — bash</span></div>
+          <div class="term-body">
+            <p><span class="tprompt">admin@squid</span>:~$ sudo apt install -y squid</p>
+            <p><span class="tprompt">admin@squid</span>:~$ sudo squid -k parse</p>
+            <p><span class="tprompt">admin@squid</span>:~$ sudo systemctl reload squid</p>
+            <p><span class="tok">✓ proxy on :3128 — MISS then HIT!</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="squid-lessons">
+    <div class="container">
+      <div class="section-head">
+        <p class="kicker">3 lessons · about 33 min</p>
+        <h2>Everything on this page</h2>
+        <p class="section-sub">Read top to bottom — each lesson ends with a quick quiz. Your checkmarks are saved on this device.</p>
+      </div>
+      <div id="squid-lessons-list"></div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <p><span class="brand-mark small" aria-hidden="true">🐧</span> Linux Servers — freedom to build without limits.</p>
+    <nav aria-label="Footer">
+      <a href="index.html">Home</a>
+      <a href="squid-proxy.html">Squid Proxy</a>
+      <a href="blank.html">Blank</a>
+    </nav>
+  </div>
+</footer>
+
+<noscript><p class="noscript-note">This page renders lesson content with JavaScript. Please enable JavaScript to read the Squid Proxy lessons.</p></noscript>
+
+<script src="assets/js/lessons.js"></script>
+<script src="assets/js/data-squid.js"></script>
+<script src="assets/js/squid-page.js"></script>
+</body>
+</html>

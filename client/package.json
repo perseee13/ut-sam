@@ -1,0 +1,25 @@
+{
+  "name": "serverpath-client",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "React (Vite) SPA for the ServerPath Linux learning site.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@gsap/react": "^2.1.2",
+    "gsap": "^3.15.0",
+    "motion": "^12.43.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "react-router-dom": "^7.18.4"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.1.1",
+    "esbuild": "^0.28.2",
+    "vite": "^8.3.2"
+  }
+}

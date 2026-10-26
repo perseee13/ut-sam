@@ -1,0 +1,68 @@
+﻿$path = 'c:\Users\Admin\Downloads\Antoniano-ut-Project\client\src\components\AppHeader.jsx'
+$lines = Get-Content -Path $path
+
+$s = -1
+for ($i = 0; $i -lt $lines.Count; $i++) {
+  if ($lines[$i] -match 'to="/file-server"') { $s = $i; break }
+}
+if ($s -lt 0) { Write-Host 'START NOT FOUND' -ForegroundColor Red; exit }
+
+$e = -1
+for ($i = 0; $i -lt $lines.Count; $i++) {
+  if ($lines[$i] -eq '</div>' -and $i + 1 -lt $lines.Count -and $lines[$i + 1] -match '^\s*{isAdmin') { $e = $i; break }
+}
+if ($e -lt 0) { Write-Host 'END NOT FOUND' -ForegroundColor Red; exit }
+
+$newBlock = @(
+  '{isLoggedIn ? (',
+  '<>',
+  '  <NavLink to="/file-server" onClick={closeMenu}>File Server</NavLink>',
+  '  <NavLink to="/mail-server" onClick={closeMenu}>Mail Server</NavLink>',
+  '  <div',
+  '    ref={squidWrapRef}',
+  '    className={"nav-dropdown" + (squidOpen ? " is-open" : "")}',
+  '    onMouseEnter={function () { setSquidOpen(true); }}',
+  '    onMouseLeave={function () { setSquidOpen(false); }}',
+  '  >',
+  '    <button',
+  '      type="button"',
+  '      className="nav-dropdown-toggle"',
+  '      aria-haspopup="true"',
+  '      aria-expanded={squidOpen}',
+  '      onClick={function () {',
+  '        if (squidOpen) {',
+  '          closeMenu();',
+  '          navigate("/squid-proxy");',
+  '        } else {',
+  '          setSquidOpen(true);',
+  '        }',
+  '      }}',
+  '    >',
+  '      Squid Proxy <span className="nav-caret" aria-hidden="true">â–¾</span>',
+  '    </button>',
+  '    {squidOpen ? (',
+  '      <div className="nav-dropdown-menu" role="menu" aria-label="Squid Proxy topics">',
+  '        <NavLink to="/squid-proxy" end role="menuitem" onClick={closeMenu}>',
+  '          ðŸ¦‘ Overview',
+  '        </NavLink>',
+  '        {SQUID_LINKS.map(function (item) {',
+  '          return (',
+  '            <NavLink key={item.to} to={item.to} role="menuitem" onClick={closeMenu}>',
+  '              {item.label}',
+  '            </NavLink>',
+  '          );',
+  '        })}',
+  '      </div>',
+  '    ) : null}',
+  '  </div>',
+  '</>',
+  ') : null}',
+)
+
+$newLines = @()
+$newLines += $lines[0..($s - 1)]
+$newLines += $newBlock
+$newLines += $lines[($e + 1)..($lines.Count - 1)]
+
+$newLines | Set-Content -Path $path -Encoding utf8
+Write-Host 'DONE' -ForegroundColor Green

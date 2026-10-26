@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 360" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b0f19" />
+      <stop offset="100%" stop-color="#111827" />
+    </linearGradient>
+    <linearGradient id="cardGrad3" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <linearGradient id="gwGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#701a75" />
+      <stop offset="100%" stop-color="#4a044e" />
+    </linearGradient>
+    <filter id="glowFuchsia" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#e879f9" flood-opacity="0.3" />
+    </filter>
+    <marker id="arrowFuchsia" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#e879f9" />
+    </marker>
+    <marker id="arrowGreen3" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#4ade80" />
+    </marker>
+  </defs>
+
+  <rect width="800" height="360" rx="16" fill="url(#bgGrad3)" stroke="#1e293b" stroke-width="1.5" />
+  
+  <g opacity="0.06">
+    <path d="M 0,60 L 800,60 M 0,120 L 800,120 M 0,180 L 800,180 M 0,240 L 800,240 M 0,300 L 800,300" stroke="#fff" stroke-dasharray="4,4" />
+    <path d="M 160,0 L 160,360 M 320,0 L 320,360 M 480,0 L 480,360 M 640,0 L 640,360" stroke="#fff" stroke-dasharray="4,4" />
+  </g>
+
+  <rect x="24" y="20" width="200" height="28" rx="6" fill="#1e293b" stroke="#334155" />
+  <text x="34" y="38" fill="#f0abfc" font-family="monospace" font-size="11" font-weight="700">TRANSPARENT PROXY / INLINE</text>
+  <text x="234" y="38" fill="#64748b" font-family="sans-serif" font-size="12">Gateway NAT Interception · Zero Client Config</text>
+
+  <!-- Node 1: Unaware Client Devices -->
+  <g transform="translate(40, 90)">
+    <rect width="180" height="190" rx="12" fill="url(#cardGrad3)" stroke="#334155" stroke-width="1.5" />
+    <rect x="16" y="16" width="36" height="36" rx="8" fill="#ec4899" fill-opacity="0.2" />
+    <text x="34" y="40" fill="#f472b6" font-size="20" text-anchor="middle">👻</text>
+    <text x="62" y="32" fill="#f8fafc" font-family="sans-serif" font-size="14" font-weight="700">Client Devices</text>
+    <text x="62" y="48" fill="#94a3b8" font-family="monospace" font-size="11">Zero Proxy Setup</text>
+    
+    <rect x="16" y="70" width="148" height="36" rx="6" fill="#0f172a" stroke="#1e293b" />
+    <text x="26" y="87" fill="#cbd5e1" font-family="sans-serif" font-size="10">Default Gateway IP:</text>
+    <text x="26" y="101" fill="#f472b6" font-family="monospace" font-size="11">192.168.1.1 (Router)</text>
+
+    <rect x="16" y="118" width="148" height="48" rx="6" fill="#0f172a" stroke="#1e293b" />
+    <text x="26" y="136" fill="#94a3b8" font-family="sans-serif" font-size="11">Outbound Request:</text>
+    <text x="26" y="152" fill="#38bdf8" font-family="monospace" font-size="11">HTTP GET :80 Normal</text>
+  </g>
+
+  <!-- Node 2: Linux Gateway + iptables + Squid Intercept -->
+  <g transform="translate(300, 75)" filter="url(#glowFuchsia)">
+    <rect width="205" height="220" rx="14" fill="url(#gwGrad)" stroke="#e879f9" stroke-width="2" />
+    <rect x="16" y="16" width="40" height="40" rx="10" fill="#c026d3" fill-opacity="0.3" />
+    <text x="36" y="43" fill="#f5d0fe" font-size="22" text-anchor="middle">🛡️</text>
+    <text x="66" y="32" fill="#fff" font-family="sans-serif" font-size="15" font-weight="700">Linux Gateway</text>
+    <text x="66" y="48" fill="#f5d0fe" font-family="monospace" font-size="12">Router + Squid</text>
+
+    <rect x="16" y="72" width="173" height="42" rx="6" fill="#4a044e" stroke="#a21caf" stroke-width="1" />
+    <text x="24" y="89" fill="#f0abfc" font-family="sans-serif" font-size="10" font-weight="700">iptables NAT REDIRECT</text>
+    <text x="24" y="104" fill="#fae8ff" font-family="monospace" font-size="10">PREROUTING :80 → :3129</text>
+
+    <rect x="16" y="122" width="173" height="40" rx="6" fill="#4a044e" stroke="#a21caf" stroke-width="1" />
+    <text x="24" y="139" fill="#f0abfc" font-family="sans-serif" font-size="10" font-weight="700">Squid Intercept Port</text>
+    <text x="24" y="153" fill="#fae8ff" font-family="monospace" font-size="10">http_port 3129 intercept</text>
+
+    <rect x="16" y="170" width="173" height="32" rx="6" fill="#4a044e" stroke="#a21caf" stroke-width="1" />
+    <text x="24" y="191" fill="#f5d0fe" font-family="sans-serif" font-size="11">⚡ Silent Cache Engine</text>
+  </g>
+
+  <!-- Node 3: Internet Target Servers -->
+  <g transform="translate(585, 90)">
+    <rect width="175" height="190" rx="12" fill="url(#cardGrad3)" stroke="#334155" stroke-width="1.5" />
+    <rect x="16" y="16" width="36" height="36" rx="8" fill="#10b981" fill-opacity="0.2" />
+    <text x="34" y="40" fill="#34d399" font-size="20" text-anchor="middle">🌐</text>
+    <text x="62" y="32" fill="#f8fafc" font-family="sans-serif" font-size="14" font-weight="700">External Web</text>
+    <text x="62" y="48" fill="#94a3b8" font-family="monospace" font-size="11">Destination Host</text>
+
+    <rect x="16" y="70" width="143" height="40" rx="6" fill="#0f172a" stroke="#1e293b" />
+    <text x="24" y="88" fill="#cbd5e1" font-family="sans-serif" font-size="10">Receives Standard TCP:</text>
+    <text x="24" y="102" fill="#34d399" font-family="monospace" font-size="11">Gateway IP :80</text>
+
+    <rect x="16" y="120" width="143" height="44" rx="6" fill="#0f172a" stroke="#1e293b" />
+    <text x="24" y="137" fill="#94a3b8" font-family="sans-serif" font-size="10">Key Benefit:</text>
+    <text x="24" y="152" fill="#e879f9" font-family="sans-serif" font-size="11" font-weight="600">No client tampering</text>
+  </g>
+
+  <!-- Connectors -->
+  <path d="M 220 160 L 292 160" stroke="#e879f9" stroke-width="2.5" marker-end="url(#arrowFuchsia)" />
+  <rect x="228" y="138" width="60" height="18" rx="4" fill="#0f172a" stroke="#e879f9" stroke-width="0.8" />
+  <text x="258" y="151" fill="#f5d0fe" font-family="monospace" font-size="9" text-anchor="middle" font-weight="700">1. RAW :80</text>
+
+  <path d="M 505 160 L 575 160" stroke="#4ade80" stroke-width="2.5" marker-end="url(#arrowGreen3)" />
+  <rect x="512" y="138" width="58" height="18" rx="4" fill="#0f172a" stroke="#4ade80" stroke-width="0.8" />
+  <text x="541" y="151" fill="#86efac" font-family="monospace" font-size="9" text-anchor="middle" font-weight="700">2. FETCH</text>
+
+  <!-- Legend -->
+  <g transform="translate(130, 320)">
+    <circle cx="10" cy="10" r="5" fill="#f472b6" />
+    <text x="22" y="13" fill="#cbd5e1" font-family="sans-serif" font-size="11">Clients need zero proxy configuration</text>
+
+    <circle cx="300" cy="10" r="5" fill="#e879f9" />
+    <text x="312" y="13" fill="#cbd5e1" font-family="sans-serif" font-size="11">Kernel firewall redirects packets to port 3129</text>
+  </g>
+</svg>

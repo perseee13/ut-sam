@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 360" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad9" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b0f19" />
+      <stop offset="100%" stop-color="#111827" />
+    </linearGradient>
+    <linearGradient id="sambaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#047857" />
+      <stop offset="100%" stop-color="#065f46" />
+    </linearGradient>
+    <filter id="glowEmerald9" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#10b981" flood-opacity="0.35" />
+    </filter>
+    <marker id="arrowGreen9" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#10b981" />
+    </marker>
+    <marker id="arrowAmber9" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#f59e0b" />
+    </marker>
+  </defs>
+
+  <rect width="800" height="360" rx="16" fill="url(#bgGrad9)" stroke="#1e293b" stroke-width="1.5" />
+
+  <rect x="24" y="20" width="220" height="28" rx="6" fill="#1e293b" stroke="#334155" />
+  <text x="34" y="38" fill="#6ee7b7" font-family="monospace" font-size="11" font-weight="700">SAMBA &amp; NFS FILE SERVER</text>
+  <text x="254" y="38" fill="#64748b" font-family="sans-serif" font-size="12">Cross-Platform LAN Shares · SMB:445 · NFS:2049</text>
+
+  <!-- Left: Multi-OS LAN Clients -->
+  <g transform="translate(40, 85)">
+    <rect width="180" height="200" rx="12" fill="#0f172a" stroke="#334155" stroke-width="1.5" />
+    <text x="18" y="30" fill="#f8fafc" font-family="sans-serif" font-size="14" font-weight="700">LAN Workstations</text>
+    <text x="18" y="46" fill="#94a3b8" font-family="monospace" font-size="11">Windows, macOS, Linux</text>
+
+    <!-- Client Windows -->
+    <rect x="14" y="60" width="152" height="36" rx="6" fill="#1e293b" />
+    <text x="22" y="76" fill="#38bdf8" font-family="sans-serif" font-size="11" font-weight="600">🪟 Windows PC</text>
+    <text x="22" y="90" fill="#94a3b8" font-family="monospace" font-size="10">\\192.168.1.10\shared</text>
+
+    <!-- Client Mac -->
+    <rect x="14" y="104" width="152" height="36" rx="6" fill="#1e293b" />
+    <text x="22" y="120" fill="#f8fafc" font-family="sans-serif" font-size="11" font-weight="600">🍎 Apple macOS</text>
+    <text x="22" y="134" fill="#94a3b8" font-family="monospace" font-size="10">smb://192.168.1.10/shared</text>
+
+    <!-- Client Linux -->
+    <rect x="14" y="148" width="152" height="38" rx="6" fill="#1e293b" />
+    <text x="22" y="164" fill="#34d399" font-family="sans-serif" font-size="11" font-weight="600">🐧 Linux Workstation</text>
+    <text x="22" y="178" fill="#94a3b8" font-family="monospace" font-size="10">mount -t nfs :/srv/nfs</text>
+  </g>
+
+  <!-- Middle: Linux File Server (Daemons) -->
+  <g transform="translate(290, 75)" filter="url(#glowEmerald9)">
+    <rect width="220" height="220" rx="14" fill="url(#sambaGrad)" stroke="#10b981" stroke-width="2" />
+    <text x="20" y="32" fill="#fff" font-family="sans-serif" font-size="16" font-weight="700">📂 Linux File Server</text>
+    <text x="20" y="48" fill="#a7f3d0" font-family="monospace" font-size="12">IP: 192.168.1.10</text>
+
+    <!-- Daemon 1: Samba -->
+    <rect x="16" y="65" width="188" height="58" rx="8" fill="#064e3b" stroke="#059669" />
+    <text x="26" y="85" fill="#34d399" font-family="sans-serif" font-size="12" font-weight="700">smbd (Samba Daemon)</text>
+    <text x="26" y="100" fill="#a7f3d0" font-family="monospace" font-size="10">Port 445 TCP · smbpasswd</text>
+    <text x="26" y="114" fill="#cbd5e1" font-family="sans-serif" font-size="9">User-level password auth</text>
+
+    <!-- Daemon 2: NFS -->
+    <rect x="16" y="133" width="188" height="58" rx="8" fill="#064e3b" stroke="#059669" />
+    <text x="26" y="153" fill="#34d399" font-family="sans-serif" font-size="12" font-weight="700">nfs-kernel-server</text>
+    <text x="26" y="168" fill="#a7f3d0" font-family="monospace" font-size="10">Port 2049 TCP/UDP · /etc/exports</text>
+    <text x="26" y="182" fill="#cbd5e1" font-family="sans-serif" font-size="9">IP subnet trusted auth</text>
+  </g>
+
+  <!-- Right: Shared Storage / Disks -->
+  <g transform="translate(580, 85)">
+    <rect width="180" height="200" rx="12" fill="#0f172a" stroke="#334155" stroke-width="1.5" />
+    <text x="18" y="30" fill="#f8fafc" font-family="sans-serif" font-size="14" font-weight="700">Shared Storage</text>
+    <text x="18" y="46" fill="#94a3b8" font-family="monospace" font-size="11">POSIX Linux Disk</text>
+
+    <rect x="14" y="60" width="152" height="48" rx="6" fill="#1e293b" />
+    <text x="22" y="78" fill="#fde68a" font-family="sans-serif" font-size="11" font-weight="600">📁 /srv/shared</text>
+    <text x="22" y="94" fill="#94a3b8" font-family="monospace" font-size="10">drwxrws--- 0775 staff</text>
+
+    <rect x="14" y="116" width="152" height="48" rx="6" fill="#1e293b" />
+    <text x="22" y="134" fill="#a7f3d0" font-family="sans-serif" font-size="11" font-weight="600">📁 /srv/nfs_exports</text>
+    <text x="22" y="150" fill="#94a3b8" font-family="monospace" font-size="10">root_squash, sync</text>
+
+    <rect x="14" y="172" width="152" height="22" rx="4" fill="#1e293b" />
+    <text x="22" y="187" fill="#64748b" font-family="sans-serif" font-size="10">RAID / LVM Pools</text>
+  </g>
+
+  <!-- Connectors -->
+  <path d="M 220 160 L 282 160" stroke="#10b981" stroke-width="2.5" marker-end="url(#arrowGreen9)" />
+  <rect x="228" y="138" width="50" height="18" rx="4" fill="#0f172a" stroke="#10b981" stroke-width="0.8" />
+  <text x="253" y="151" fill="#6ee7b7" font-family="monospace" font-size="9" text-anchor="middle" font-weight="700">SMB:445</text>
+
+  <path d="M 510 160 L 572 160" stroke="#f59e0b" stroke-width="2.5" marker-end="url(#arrowAmber9)" />
+  <rect x="518" y="138" width="50" height="18" rx="4" fill="#0f172a" stroke="#f59e0b" stroke-width="0.8" />
+  <text x="543" y="151" fill="#fde68a" font-family="monospace" font-size="9" text-anchor="middle" font-weight="700">DISK I/O</text>
+
+  <!-- Legend -->
+  <g transform="translate(140, 320)">
+    <circle cx="10" cy="10" r="5" fill="#10b981" />
+    <text x="22" y="13" fill="#cbd5e1" font-family="sans-serif" font-size="11">Windows/macOS users map SMB shares using username/password</text>
+
+    <circle cx="430" cy="10" r="5" fill="#f59e0b" />
+    <text x="442" y="13" fill="#cbd5e1" font-family="sans-serif" font-size="11">Fast kernel-level NFS exports</text>
+  </g>
+</svg>

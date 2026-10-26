@@ -1,0 +1,22 @@
+{
+  "name": "serverpath",
+  "version": "1.1.0",
+  "private": true,
+  "description": "ServerPath - a self-paced learning website about running Linux servers. React/Vite web client + Express API.",
+  "scripts": {
+    "start": "node scripts/serve.js",
+    "start:lan": "node scripts/serve.js",
+    "check": "node scripts/validate-content.js && node scripts/smoke-test.js && node scripts/render-test.js",
+    "test": "node scripts/serve-test.js",
+    "dev:server": "npm --prefix server run dev",
+    "dev:client": "npm --prefix client run dev",
+    "build:client": "npm --prefix client run build",
+    "start:api": "npm --prefix server start",
+    "start:prod": "npm run build:client && npm run start:api",
+    "render-build": "npm --prefix server install && npm --prefix client install && npm --prefix client run build",
+    "render-start": "npm --prefix server start",
+    "share": "node scripts/share.js",
+    "test:api": "npm --prefix server test"
+  }
+}
+

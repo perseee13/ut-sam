@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 360" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b0f19" />
+      <stop offset="100%" stop-color="#111827" />
+    </linearGradient>
+    <linearGradient id="cardGrad2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <linearGradient id="reverseGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e1b4b" />
+      <stop offset="100%" stop-color="#312e81" />
+    </linearGradient>
+    <filter id="glowViolet" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#818cf8" flood-opacity="0.3" />
+    </filter>
+    <marker id="arrowIndigo" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#818cf8" />
+    </marker>
+    <marker id="arrowTeal2" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#2dd4bf" />
+    </marker>
+  </defs>
+
+  <rect width="800" height="360" rx="16" fill="url(#bgGrad2)" stroke="#1e293b" stroke-width="1.5" />
+  
+  <g opacity="0.06">
+    <path d="M 0,60 L 800,60 M 0,120 L 800,120 M 0,180 L 800,180 M 0,240 L 800,240 M 0,300 L 800,300" stroke="#fff" stroke-dasharray="4,4" />
+    <path d="M 160,0 L 160,360 M 320,0 L 320,360 M 480,0 L 480,360 M 640,0 L 640,360" stroke="#fff" stroke-dasharray="4,4" />
+  </g>
+
+  <rect x="24" y="20" width="180" height="28" rx="6" fill="#1e293b" stroke="#334155" />
+  <text x="34" y="38" fill="#a5b4fc" font-family="monospace" font-size="11" font-weight="700">REVERSE PROXY ARCHITECTURE</text>
+  <text x="214" y="38" fill="#64748b" font-family="sans-serif" font-size="12">Ports 80 / 443 · Shield &amp; Web Acceleration</text>
+
+  <!-- Left: Public Internet Visitors -->
+  <g transform="translate(40, 90)">
+    <rect width="180" height="190" rx="12" fill="url(#cardGrad2)" stroke="#334155" stroke-width="1.5" />
+    <rect x="16" y="16" width="36" height="36" rx="8" fill="#6366f1" fill-opacity="0.2" />
+    <text x="34" y="40" fill="#818cf8" font-size="20" text-anchor="middle">🌐</text>
+    <text x="62" y="32" fill="#f8fafc" font-family="sans-serif" font-size="14" font-weight="700">Internet Users</text>
+    <text x="62" y="48" fill="#94a3b8" font-family="monospace" font-size="11">0.0.0.0/0 (Anywhere)</text>
+
+    <rect x="16" y="70" width="148" height="34" rx="6" fill="#0f172a" stroke="#1e293b" />
+    <text x="26" y="91" fill="#cbd5e1" font-family="monospace" font-size="11">https://app.site.com</text>
+
+    <rect x="16" y="114" width="148" height="50" rx="6" fill="#0f172a" stroke="#1e293b" />
+    <text x="26" y="132" fill="#94a3b8" font-family="sans-serif" font-size="11">Connects to Frontend:</text>
+    <text x="26" y="150" fill="#a5b4fc" font-family="monospace" font-size="11">Public IP :443 (TLS)</text>
+  </g>
+
+  <!-- Middle: Squid Reverse Proxy / Accelerator -->
+  <g transform="translate(300, 75)" filter="url(#glowViolet)">
+    <rect width="200" height="220" rx="14" fill="url(#reverseGrad)" stroke="#818cf8" stroke-width="2" />
+    <rect x="16" y="16" width="40" height="40" rx="10" fill="#6366f1" fill-opacity="0.3" />
+    <text x="36" y="43" fill="#c7d2fe" font-size="22" text-anchor="middle">🔁</text>
+    <text x="66" y="32" fill="#fff" font-family="sans-serif" font-size="15" font-weight="700">Squid Accelerator</text>
+    <text x="66" y="48" fill="#c7d2fe" font-family="monospace" font-size="12">http_port 80 / 443</text>
+
+    <rect x="16" y="72" width="168" height="34" rx="6" fill="#1e1b4b" stroke="#4338ca" stroke-width="1" />
+    <text x="26" y="93" fill="#a5b4fc" font-family="sans-serif" font-size="11" font-weight="600">🔒 SSL/TLS Termination</text>
+
+    <rect x="16" y="116" width="168" height="34" rx="6" fill="#1e1b4b" stroke="#4338ca" stroke-width="1" />
+    <text x="26" y="137" fill="#a5b4fc" font-family="sans-serif" font-size="11" font-weight="600">⚡ Static Assets In-Cache</text>
+
+    <rect x="16" y="160" width="168" height="42" rx="6" fill="#1e1b4b" stroke="#4338ca" stroke-width="1" />
+    <text x="26" y="178" fill="#e0e7ff" font-family="sans-serif" font-size="11" font-weight="600">🛡️ Backend Shielding</text>
+    <text x="26" y="193" fill="#a5b4fc" font-family="monospace" font-size="10">cache_peer parent :8080</text>
+  </g>
+
+  <!-- Right: Protected Backend Web Services -->
+  <g transform="translate(580, 90)">
+    <rect width="180" height="190" rx="12" fill="url(#cardGrad2)" stroke="#334155" stroke-width="1.5" />
+    <rect x="16" y="16" width="36" height="36" rx="8" fill="#059669" fill-opacity="0.2" />
+    <text x="34" y="40" fill="#34d399" font-size="20" text-anchor="middle">⚙️</text>
+    <text x="62" y="32" fill="#f8fafc" font-family="sans-serif" font-size="14" font-weight="700">Origin App</text>
+    <text x="62" y="48" fill="#94a3b8" font-family="monospace" font-size="11">Protected LAN</text>
+
+    <rect x="16" y="70" width="148" height="42" rx="6" fill="#0f172a" stroke="#1e293b" />
+    <text x="26" y="87" fill="#38bdf8" font-family="monospace" font-size="11">127.0.0.1:8080</text>
+    <text x="26" y="103" fill="#64748b" font-family="sans-serif" font-size="10">Node.js / Python API</text>
+
+    <rect x="16" y="122" width="148" height="42" rx="6" fill="#0f172a" stroke="#1e293b" />
+    <text x="26" y="139" fill="#34d399" font-family="monospace" font-size="11">127.0.0.1:8000</text>
+    <text x="26" y="155" fill="#64748b" font-family="sans-serif" font-size="10">Dynamic Backend</text>
+  </g>
+
+  <!-- Connectors -->
+  <path d="M 220 160 L 292 160" stroke="#818cf8" stroke-width="2.5" marker-end="url(#arrowIndigo)" />
+  <rect x="230" y="138" width="56" height="18" rx="4" fill="#0f172a" stroke="#818cf8" stroke-width="0.8" />
+  <text x="258" y="151" fill="#c7d2fe" font-family="monospace" font-size="9" text-anchor="middle" font-weight="700">1. HTTPS</text>
+
+  <path d="M 500 160 L 572 160" stroke="#2dd4bf" stroke-width="2.5" marker-end="url(#arrowTeal2)" />
+  <rect x="508" y="138" width="60" height="18" rx="4" fill="#0f172a" stroke="#2dd4bf" stroke-width="0.8" />
+  <text x="538" y="151" fill="#5eead4" font-family="monospace" font-size="9" text-anchor="middle" font-weight="700">2. HTTP PEER</text>
+
+  <path d="M 572 205 L 508 205" stroke="#34d399" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arrowTeal2)" />
+  <text x="540" y="222" fill="#34d399" font-family="monospace" font-size="9" text-anchor="middle">3. DATA RETURN</text>
+
+  <!-- Bottom Legend -->
+  <g transform="translate(140, 320)">
+    <circle cx="10" cy="10" r="5" fill="#818cf8" />
+    <text x="22" y="13" fill="#cbd5e1" font-family="sans-serif" font-size="11">Encrypted Inbound Traffic</text>
+
+    <circle cx="230" cy="10" r="5" fill="#2dd4bf" />
+    <text x="242" y="13" fill="#cbd5e1" font-family="sans-serif" font-size="11">Internal Fast Peer Proxying</text>
+
+    <circle cx="460" cy="10" r="5" fill="#34d399" />
+    <text x="472" y="13" fill="#cbd5e1" font-family="sans-serif" font-size="11">Origin Server Shielded from Direct Internet</text>
+  </g>
+</svg>

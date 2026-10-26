@@ -1,0 +1,25 @@
+
+  ================================================
+   ServerPath running!
+  ================================================
+   Sa server na ito buksan: http://localhost:4000
+
+   PANG-ACCESS NG IBANG DEVICE (kahit anong network
+   basta abot ang server, itype lang ito sa browser):
+     -> http://192.168.56.1:4000  [Ethernet 4]
+     -> http://192.168.8.51:4000  [Wi-Fi]
+
+   Halimbawa sa phone/laptop browser:
+     http://192.168.56.1:4000
+
+    GET /api/health
+    GET /api/stats
+    GET /api/course
+    GET /api/modules
+    GET /api/modules/:moduleId
+    GET /api/modules/:moduleId/lessons/:lessonId
+    GET /api/cheatsheet
+    POST /api/auth/register   (MySQL)
+    POST /api/auth/login      (MySQL)
+    GET  /api/auth/me         (Bearer token)
+

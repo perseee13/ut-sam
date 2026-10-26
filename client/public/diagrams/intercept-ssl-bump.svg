@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 360" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b0f19" />
+      <stop offset="100%" stop-color="#111827" />
+    </linearGradient>
+    <linearGradient id="cardGrad4" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <linearGradient id="sslGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#78350f" />
+      <stop offset="100%" stop-color="#451a03" />
+    </linearGradient>
+    <filter id="glowAmber" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#f59e0b" flood-opacity="0.35" />
+    </filter>
+    <marker id="arrowGold" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#fbbf24" />
+    </marker>
+    <marker id="arrowCyan4" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#38bdf8" />
+    </marker>
+  </defs>
+
+  <rect width="800" height="360" rx="16" fill="url(#bgGrad4)" stroke="#1e293b" stroke-width="1.5" />
+  
+  <g opacity="0.06">
+    <path d="M 0,60 L 800,60 M 0,120 L 800,120 M 0,180 L 800,180 M 0,240 L 800,240 M 0,300 L 800,300" stroke="#fff" stroke-dasharray="4,4" />
+    <path d="M 160,0 L 160,360 M 320,0 L 320,360 M 480,0 L 480,360 M 640,0 L 640,360" stroke="#fff" stroke-dasharray="4,4" />
+  </g>
+
+  <rect x="24" y="20" width="220" height="28" rx="6" fill="#1e293b" stroke="#334155" />
+  <text x="34" y="38" fill="#fde68a" font-family="monospace" font-size="11" font-weight="700">SSL BUMP &amp; HTTPS INTERCEPT</text>
+  <text x="254" y="38" fill="#64748b" font-family="sans-serif" font-size="12">Dynamic Forged TLS · Enterprise Inspection</text>
+
+  <!-- Left: Client with Installed Lab Root CA -->
+  <g transform="translate(40, 90)">
+    <rect width="180" height="190" rx="12" fill="url(#cardGrad4)" stroke="#334155" stroke-width="1.5" />
+    <rect x="16" y="16" width="36" height="36" rx="8" fill="#f59e0b" fill-opacity="0.2" />
+    <text x="34" y="40" fill="#fbbf24" font-size="20" text-anchor="middle">💻</text>
+    <text x="62" y="32" fill="#f8fafc" font-family="sans-serif" font-size="14" font-weight="700">Client Device</text>
+    <text x="62" y="48" fill="#94a3b8" font-family="monospace" font-size="11">Trusted Root CA</text>
+
+    <rect x="16" y="70" width="148" height="42" rx="6" fill="#0f172a" stroke="#1e293b" />
+    <text x="24" y="87" fill="#fde68a" font-family="sans-serif" font-size="10">Installed Trust Anchor:</text>
+    <text x="24" y="103" fill="#fbbf24" font-family="monospace" font-size="10">myCA.pem (Trusted)</text>
+
+    <rect x="16" y="122" width="148" height="44" rx="6" fill="#0f172a" stroke="#1e293b" />
+    <text x="24" y="139" fill="#94a3b8" font-family="sans-serif" font-size="10">TLS Leg 1:</text>
+    <text x="24" y="155" fill="#38bdf8" font-family="monospace" font-size="10">Client ⇄ Squid Proxy</text>
+  </g>
+
+  <!-- Middle: Squid SSL Bump Engine -->
+  <g transform="translate(295, 75)" filter="url(#glowAmber)">
+    <rect width="210" height="220" rx="14" fill="url(#sslGrad)" stroke="#f59e0b" stroke-width="2" />
+    <rect x="16" y="16" width="40" height="40" rx="10" fill="#f59e0b" fill-opacity="0.3" />
+    <text x="36" y="43" fill="#fef08a" font-size="22" text-anchor="middle">🔒</text>
+    <text x="66" y="32" fill="#fff" font-family="sans-serif" font-size="15" font-weight="700">SSL Bump Engine</text>
+    <text x="66" y="48" fill="#fde68a" font-family="monospace" font-size="12">security_file_certgen</text>
+
+    <rect x="16" y="72" width="178" height="34" rx="6" fill="#451a03" stroke="#b45309" stroke-width="1" />
+    <text x="26" y="93" fill="#fde68a" font-family="sans-serif" font-size="11" font-weight="600">1. Peek SNI Header (Domain)</text>
+
+    <rect x="16" y="116" width="178" height="34" rx="6" fill="#451a03" stroke="#b45309" stroke-width="1" />
+    <text x="26" y="137" fill="#fde68a" font-family="sans-serif" font-size="11" font-weight="600">2. Generate On-The-Fly Cert</text>
+
+    <rect x="16" y="160" width="178" height="42" rx="6" fill="#451a03" stroke="#b45309" stroke-width="1" />
+    <text x="26" y="178" fill="#fff" font-family="sans-serif" font-size="11" font-weight="600">3. Decrypt &amp; Filter Content</text>
+    <text x="26" y="193" fill="#fde68a" font-family="monospace" font-size="10">Block malware / Inspect URLs</text>
+  </g>
+
+  <!-- Right: Remote HTTPS Origin -->
+  <g transform="translate(585, 90)">
+    <rect width="175" height="190" rx="12" fill="url(#cardGrad4)" stroke="#334155" stroke-width="1.5" />
+    <rect x="16" y="16" width="36" height="36" rx="8" fill="#0284c7" fill-opacity="0.2" />
+    <text x="34" y="40" fill="#38bdf8" font-size="20" text-anchor="middle">🌐</text>
+    <text x="62" y="32" fill="#f8fafc" font-family="sans-serif" font-size="14" font-weight="700">HTTPS Server</text>
+    <text x="62" y="48" fill="#94a3b8" font-family="monospace" font-size="11">Real Certificate</text>
+
+    <rect x="16" y="70" width="143" height="42" rx="6" fill="#0f172a" stroke="#1e293b" />
+    <text x="24" y="87" fill="#cbd5e1" font-family="sans-serif" font-size="10">Leg 2 TLS Session:</text>
+    <text x="24" y="103" fill="#38bdf8" font-family="monospace" font-size="10">Squid ⇄ Real Web</text>
+
+    <rect x="16" y="122" width="143" height="44" rx="6" fill="#0f172a" stroke="#1e293b" />
+    <text x="24" y="139" fill="#94a3b8" font-family="sans-serif" font-size="10">Upstream TLS:</text>
+    <text x="24" y="155" fill="#34d399" font-family="monospace" font-size="10">Official CA Signed</text>
+  </g>
+
+  <!-- Connectors -->
+  <path d="M 220 160 L 287 160" stroke="#fbbf24" stroke-width="2.5" marker-end="url(#arrowGold)" />
+  <rect x="226" y="138" width="60" height="18" rx="4" fill="#0f172a" stroke="#fbbf24" stroke-width="0.8" />
+  <text x="256" y="151" fill="#fde68a" font-family="monospace" font-size="9" text-anchor="middle" font-weight="700">TLS LEG 1</text>
+
+  <path d="M 505 160 L 577 160" stroke="#38bdf8" stroke-width="2.5" marker-end="url(#arrowCyan4)" />
+  <rect x="515" y="138" width="60" height="18" rx="4" fill="#0f172a" stroke="#38bdf8" stroke-width="0.8" />
+  <text x="545" y="151" fill="#7dd3fc" font-family="monospace" font-size="9" text-anchor="middle" font-weight="700">TLS LEG 2</text>
+
+  <!-- Legend -->
+  <g transform="translate(140, 320)">
+    <circle cx="10" cy="10" r="5" fill="#fbbf24" />
+    <text x="22" y="13" fill="#cbd5e1" font-family="sans-serif" font-size="11">Internal TLS encrypted with local dynamic CA</text>
+
+    <circle cx="340" cy="10" r="5" fill="#38bdf8" />
+    <text x="352" y="13" fill="#cbd5e1" font-family="sans-serif" font-size="11">Standard upstream internet TLS connection</text>
+  </g>
+</svg>

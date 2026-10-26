@@ -1,0 +1,2214 @@
+{
+  "meta": {
+    "generatedAt": "2026-10-18T15:01:47.235Z",
+    "moduleCount": 8,
+    "lessonCount": 26,
+    "minutes": 262
+  },
+  "modules": [
+    {
+      "id": "squid",
+      "title": "Squid Proxy",
+      "icon": "🦑",
+      "sum": "Run your first caching forward proxy: install Squid, open it to your LAN, filter sites with ACLs and speed up repeat visits with caching.",
+      "lessons": [
+        {
+          "id": "what-is-squid",
+          "title": "What is Squid Proxy (and why it is first)",
+          "min": 10,
+          "sum": "Forward vs reverse proxies, what caching buys you, and where Squid sits between your LAN and the internet.",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Your first topic is **Squid Proxy** because it touches everything else you will learn: networking, services, files and security — in one small, visible project. A client asks Squid, Squid asks the internet, then Squid answers the client — and remembers the answer for next time."
+            },
+            {
+              "t": "h",
+              "x": "Forward proxy vs reverse proxy"
+            },
+            {
+              "t": "ul",
+              "x": [
+                "**Forward proxy (Squid default)** — sits near the clients. Your laptop and classmates point their browsers at Squid, and Squid fetches the web for them. Good for caching, filtering and saving bandwidth.",
+                "**Reverse proxy (nginx)** — sits in front of a server. The internet talks to nginx, nginx talks to your app. Good for TLS and serving sites.",
+                "This module is about the **forward** side: one Squid box serving a whole classroom or office LAN."
+              ]
+            },
+            {
+              "t": "h",
+              "x": "What caching buys you"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "title": "The idea in one picture",
+              "x": "# without proxy: every client fetches from the internet\n# laptop -> internet   (100 MB downloaded 30x = 3000 MB)\n#\n# with Squid: first client fills the cache, the rest reuse it\n# laptop  -> squid (3128) -> internet\n# laptop2 -> squid (HIT from cache, no download)\n#\n# point a client at Squid for a quick test:\nexport http_proxy=http://192.168.1.10:3128\nexport https_proxy=http://192.168.1.10:3128\ncurl -I http://example.com"
+            },
+            {
+              "t": "tip",
+              "x": "Think of Squid as a shared notebook: the first student looks up the answer online and writes it down; the next 29 students just read the notebook. Same web, far less waiting."
+            },
+            {
+              "t": "warn",
+              "x": "A forward proxy sees the domains you visit. Only point your devices at a Squid you or your school runs — never a random proxy IP from the internet."
+            }
+          ],
+          "quiz": [
+            {
+              "q": "Where does a forward proxy like Squid sit?",
+              "opts": [
+                "In front of a web server, facing the internet",
+                "Near the clients — clients ask Squid, Squid asks the internet",
+                "Inside the Linux kernel",
+                "Only inside a web browser"
+              ],
+              "a": 1,
+              "why": "A forward proxy serves clients on your LAN; a reverse proxy sits in front of servers. Squid defaults to the forward side."
+            },
+            {
+              "q": "What is the main win of Squid caching on a classroom LAN?",
+              "opts": [
+                "It makes the internet faster for everyone else",
+                "Repeat downloads are served from Squid instead of re-downloading",
+                "It removes the need for IP addresses",
+                "It replaces SSH"
+              ],
+              "a": 1,
+              "why": "The first fetch fills the cache; later identical requests are HITs served locally — less bandwidth, faster loads."
+            }
+          ]
+        },
+        {
+          "id": "install-configure",
+          "title": "Install and run Squid",
+          "min": 12,
+          "sum": "Install Squid on Ubuntu, open port 3128, point a client at it and prove caching works.",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Squid is one package, one config file and one port: **3128**. Install it, start it, then tell one client to use it before you open it to the whole LAN."
+            },
+            {
+              "t": "h",
+              "x": "Install and check"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "sudo apt update && sudo apt install -y squid\nsudo systemctl enable --now squid\nsudo systemctl status squid --no-pager\nss -tlnp | grep 3128"
+            },
+            {
+              "t": "h",
+              "x": "The two lines that matter in squid.conf"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "title": "/etc/squid/squid.conf (essentials)",
+              "x": "http_port 3128\nacl localnet src 192.168.0.0/16\nhttp_access allow localnet"
+            },
+            {
+              "t": "h",
+              "x": "Prove it from a client"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "export http_proxy=http://192.168.1.10:3128 https_proxy=http://192.168.1.10:3128\ncurl -I http://example.com"
+            },
+            {
+              "t": "tip",
+              "x": "`squid -k parse` before every reload, and `journalctl -u squid -n 50` when it misbehaves."
+            },
+            {
+              "t": "warn",
+              "x": "Default Squid only allows localhost. Until you add your LAN to `localnet`, other devices get access-denied — that is the safe default, not a bug."
+            }
+          ],
+          "quiz": [
+            {
+              "q": "Which port does Squid listen on by default?",
+              "opts": [
+                "80",
+                "443",
+                "3128",
+                "22"
+              ],
+              "a": 2,
+              "why": "3128 is the classic Squid forward-proxy port."
+            },
+            {
+              "q": "Safe order after editing squid.conf?",
+              "opts": [
+                "Reload squid, then check syntax",
+                "Run `squid -k parse` to validate, then reload",
+                "Reboot the server",
+                "Delete the config and reinstall"
+              ],
+              "a": 1,
+              "why": "Validate first with `squid -k parse`, then reload."
+            }
+          ]
+        },
+        {
+          "id": "acls-caching",
+          "title": "ACLs, filtering and caching",
+          "min": 11,
+          "sum": "Allow your LAN, block time-wasting sites, set cache size and read the logs.",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Once Squid runs, the real work is **who may use it and what they may fetch**. That is all done with ACLs plus a few cache knobs."
+            },
+            {
+              "t": "h",
+              "x": "Allow the classroom, block the distractions"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "title": "/etc/squid/squid.conf — access rules",
+              "x": "acl lan src 192.168.1.0/24\nacl blocked dstdomain .games.example .video.example\nhttp_access deny blocked\nhttp_access allow lan\nhttp_access deny all"
+            },
+            {
+              "t": "ul",
+              "x": [
+                "Order matters: a `deny blocked` line must sit **above** the broad `allow lan`, or it never triggers.",
+                "Start with one LAN range — opening to `all` turns your box into an open relay for strangers."
+              ]
+            },
+            {
+              "t": "h",
+              "x": "Cache size and logs"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "cache_dir ufs /var/spool/squid 2000 16 256\nmaximum_object_size 128 MB\n# watch the log: first visit TCP_MISS, refresh TCP_HIT:\n# sudo tail -f /var/log/squid/access.log"
+            },
+            {
+              "t": "tip",
+              "x": "Refresh the same page twice while tailing access.log — MISS then HIT is the moment Squid clicks."
+            },
+            {
+              "t": "warn",
+              "x": "HTTPS bodies are encrypted, so Squid caches the connection setup but not the page content unless you do full TLS interception."
+            }
+          ],
+          "quiz": [
+            {
+              "q": "Why must `deny blocked` come before `allow lan`?",
+              "opts": [
+                "Order does not matter",
+                "Squid uses the first matching rule, so the specific deny has to win first",
+                "Because deny rules are ignored",
+                "Because Squid reads bottom-up"
+              ],
+              "a": 1,
+              "why": "Squid stops at the first match. A broad allow placed first would swallow the deny."
+            },
+            {
+              "q": "In access.log, what does TCP_HIT mean?",
+              "opts": [
+                "The request failed",
+                "Squid served it from cache without re-downloading",
+                "The client is blocked",
+                "Squid restarted"
+              ],
+              "a": 1,
+              "why": "TCP_MISS is fetched from the internet; TCP_HIT is served from the local cache."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "essentials",
+      "title": "Linux Essentials",
+      "icon": "🐧",
+      "sum": "Understand what Linux actually is, log in for the first time, and learn your way around the filesystem of a fresh server.",
+      "lessons": [
+        {
+          "id": "what-is-linux",
+          "title": "What is Linux (and why servers love it)",
+          "min": 9,
+          "sum": "Kernel vs distribution, the big distro families, and how to pick a server operating system you can live with.",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "A **Linux server** is just a computer you reach over the network: no monitor, no mouse, and instead of a desktop you get a shell. This course is about being fluent in that environment."
+            },
+            {
+              "t": "h",
+              "x": "Kernel vs distribution"
+            },
+            {
+              "t": "p",
+              "x": "Strictly speaking, Linux is only the **kernel** — the piece that talks to hardware, schedules processes and manages memory. What you actually install is a **distribution**: the kernel plus a package manager, shells, libraries and tools, packaged and maintained together."
+            },
+            {
+              "t": "ul",
+              "x": [
+                "**Debian family** — Debian, Ubuntu, Mint. Package manager: `apt`. The most common choice for beginners and web servers.",
+                "**Red Hat family** — RHEL, Fedora, AlmaLinux, Rocky. Package manager: `dnf`. Common in enterprises.",
+                "**SUSE family** — openSUSE, SUSE Linux Enterprise. Package manager: `zypper`.",
+                "**Others** — Alpine (tiny; huge in containers), Arch (rolling release, build-it-yourself)."
+              ]
+            },
+            {
+              "t": "h",
+              "x": "Why the internet runs on Linux servers"
+            },
+            {
+              "t": "ul",
+              "x": [
+                "Free and open source — you can inspect it, script it and ship it.",
+                "Stable: years of uptime is normal, not newsworthy.",
+                "Remote-first: SSH and a shell are enough to run everything.",
+                "Automation-friendly: every task is a command you can repeat and schedule.",
+                "Scales from a Raspberry Pi to server farms with thousands of machines."
+              ]
+            },
+            {
+              "t": "h",
+              "x": "Which distro should you learn on?"
+            },
+            {
+              "t": "p",
+              "x": "Pick one and stay with it for a while. For a first server, an **Ubuntu LTS** or **Debian stable** machine is the safest choice — enormous community, tutorials everywhere. Everything you learn transfers to the other distros."
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "title": "See what you're running",
+              "x": "cat /etc/os-release   # distribution name and version\nuname -r              # kernel version"
+            },
+            {
+              "t": "tip",
+              "x": "This course uses Debian/Ubuntu commands (`apt`, `ufw`, `/var/log/syslog`). When something differs on the Red Hat family, a note will tell you — e.g. `dnf` instead of `apt`."
+            },
+            {
+              "t": "warn",
+              "x": "Don't judge Linux by a desktop you tried once. Server Linux is a much calmer world: text files, services and logs — and nobody will ever ask you to install printer drivers."
+            }
+          ],
+          "quiz": [
+            {
+              "q": "What does a distribution add on top of the Linux kernel?",
+              "opts": [
+                "Device drivers only",
+                "A package manager, shells, libraries and user-space tools",
+                "A graphical desktop, always",
+                "Nothing — the words mean the same thing"
+              ],
+              "a": 1,
+              "why": "The kernel drives the hardware; the distribution is everything around it: package manager, core utilities, init system, documentation and default services."
+            },
+            {
+              "q": "Which command prints the distribution name and version?",
+              "opts": [
+                "`uname -r`",
+                "`cat /etc/os-release`",
+                "`ls /`",
+                "`top`"
+              ],
+              "a": 1,
+              "why": "`/etc/os-release` describes the distribution. `uname -r` shows only the kernel version."
+            }
+          ]
+        },
+        {
+          "id": "first-login",
+          "title": "Your first login: reading the shell",
+          "min": 8,
+          "sum": "What the prompt is really telling you, how to size up a machine in ten seconds, and how to get help without leaving the terminal.",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "You will meet a server through a **shell** — nearly always `bash` — over an SSH connection. The first skill is not typing commands, it is understanding what the screen already tells you."
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "title": "First contact",
+              "x": "ssh deploy@203.0.113.10\n\nWelcome to Ubuntu LTS\nLast login: Sun Oct  4 21:58:12 2026 from 198.51.100.7\ndeploy@web-01:~$"
+            },
+            {
+              "t": "h",
+              "x": "Anatomy of the prompt"
+            },
+            {
+              "t": "ul",
+              "x": [
+                "`deploy` — the user you are logged in as.",
+                "`web-01` — the hostname. **Check it** before anything destructive; production looks exactly like staging.",
+                "`~` — your current directory; `~` is shorthand for your home directory.",
+                "`$` — a normal user. A `#` here means **root**, where every typo is a loaded weapon."
+              ]
+            },
+            {
+              "t": "h",
+              "x": "Sizing up the machine in ten seconds"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "whoami    # which user am I?\nhostname  # which machine is this?\nuptime    # uptime and load averages\nuname -a  # kernel and architecture\ncat /etc/os-release"
+            },
+            {
+              "t": "h",
+              "x": "Getting help without leaving the terminal"
+            },
+            {
+              "t": "ul",
+              "x": [
+                "`man grep` — the manual page. `q` quits, `/` searches inside the page.",
+                "`grep --help` — quick summary of flags.",
+                "`man 5 crontab` — the number picks a manual section; section 5 is file formats.",
+                "`apropos 'copy files'` — search manuals by keyword when you forget a command name."
+              ]
+            },
+            {
+              "t": "tip",
+              "x": "Live in the shell and it will love you back: **Tab** completes command and file names, the **up arrow** replays history, and `history | grep ssh` finds that command from last week."
+            },
+            {
+              "t": "warn",
+              "x": "Copy-pasting commands from the internet is how servers get compromised. Read every command before running it — especially anything containing `sudo`, `curl | sh` or `rm`."
+            }
+          ],
+          "quiz": [
+            {
+              "q": "The prompt ends with `#` instead of `$`. What does that mean?",
+              "opts": [
+                "The server is broken",
+                "You are in a read-only directory",
+                "You are root — commands can modify anything",
+                "You are connected through a proxy"
+              ],
+              "a": 2,
+              "why": "`#` is the traditional root prompt. Slow down and double-check paths when you see it."
+            },
+            {
+              "q": "Which key lists suggestions and completes names as you type?",
+              "opts": [
+                "Ctrl+C",
+                "Tab",
+                "Alt+F4",
+                "Only the up arrow"
+              ],
+              "a": 1,
+              "why": "Tab completion works for commands, paths and many arguments. Press it twice when unsure."
+            }
+          ]
+        },
+        {
+          "id": "filesystem-tour",
+          "title": "A tour of the filesystem",
+          "min": 10,
+          "sum": "What lives where: a map of /, absolute vs relative paths, and moving around a server without getting lost.",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "On a Linux server **everything is a file**, and there is a single tree that starts at `/`. Extra disks do not get drive letters — they get **mounted** into that tree."
+            },
+            {
+              "t": "h",
+              "x": "The directories you will actually use"
+            },
+            {
+              "t": "ul",
+              "x": [
+                "`/etc` — configuration. Nearly every service keeps its settings here.",
+                "`/var` — variable data: logs in `/var/log`, mail, caches, databases.",
+                "`/home` — one directory per human user.",
+                "`/root` — the root user's home directory (not `/home/root`).",
+                "`/usr` — installed programs, libraries and documentation.",
+                "`/opt` — add-on software installed as a bundle.",
+                "`/tmp` — scratch space, wiped on reboot. Never store anything you love here.",
+                "`/proc`, `/sys`, `/dev` — virtual files that expose the kernel, hardware and devices."
+              ]
+            },
+            {
+              "t": "h",
+              "x": "Moving around"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "pwd                 # where am I?\nls -lah /var/log    # all files, sizes, long format\ncd /etc/nginx       # absolute path\ncd ..               # up one level\ncd -                # back to the previous directory\ncd ~                # home"
+            },
+            {
+              "t": "h",
+              "x": "Absolute vs relative paths"
+            },
+            {
+              "t": "p",
+              "x": "A path starting with `/` is **absolute**: it means the same thing from anywhere. Anything else is **relative** to your current directory. Scripts should always use absolute paths, so they behave the same no matter who runs them."
+            },
+            {
+              "t": "tip",
+              "x": "`ls -lat /var/log` (newest first) is the fastest way to see what changed recently. `ls -lah` reveals hidden dotfiles and shows sizes in KB/MB instead of bytes."
+            },
+            {
+              "t": "warn",
+              "x": "Wildcards are expanded by the **shell** before the command even runs. `rm *.log` deletes whatever matches in *that* directory — run `ls *.log` first and look at the list before you delete it."
+            }
+          ],
+          "quiz": [
+            {
+              "q": "Where do most system and service logs live?",
+              "opts": [
+                "`/etc/log`",
+                "`/var/log`",
+                "`/home/log`",
+                "`/log`"
+              ],
+              "a": 1,
+              "why": "`/var` holds variable data, and `/var/log` is the traditional home of logs — one of the first places to look when something misbehaves."
+            },
+            {
+              "q": "Which of these is an absolute path?",
+              "opts": [
+                "`../etc/hosts`",
+                "`nginx/nginx.conf`",
+                "`/etc/hosts`",
+                "`~etc`"
+              ],
+              "a": 2,
+              "why": "Only a leading `/` anchors the path to the root of the tree. Everything else depends on where you currently are."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "files",
+      "title": "Files & Text Power Tools",
+      "icon": "🗂️",
+      "sum": "Create, read, search and delete files safely — then glue small commands together with pipes like a proper sysadmin.",
+      "lessons": [
+        {
+          "id": "file-ops",
+          "title": "Files and directories: the core moves",
+          "min": 9,
+          "sum": "Create, copy, move, read and (carefully) delete files, plus symlinks, file types and sizes.",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Most server work is creating, reading, moving and deleting files. Own these few commands and everything else gets easier."
+            },
+            {
+              "t": "h",
+              "x": "Create and organise"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "mkdir -p /srv/app/{logs,data}    # nested directories in one shot\ntouch /srv/app/.env               # create an empty file\ncp -r /srv/app /srv/app-backup    # recursive copy\nmv old-name.txt new-name.txt      # rename (instant, same filesystem)\nmv notes.txt /tmp/                # move to another directory"
+            },
+            {
+              "t": "h",
+              "x": "Read without opening an editor"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "cat /etc/hostname            # print the whole file\nless /etc/nginx/nginx.conf   # scroll; q quits, / searches\nhead -n 20 /var/log/syslog   # first 20 lines\ntail -n 50 /var/log/syslog   # last 50 lines\ntail -f /var/log/syslog      # follow live; Ctrl+C stops"
+            },
+            {
+              "t": "h",
+              "x": "Delete carefully"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "rm notes.txt\nrm -r old-project/    # directory and everything in it\nrm -i important.txt   # ask before each deletion"
+            },
+            {
+              "t": "warn",
+              "x": "**There is no recycle bin.** `rm -rf` deletes recursively, without prompts, no matter how tired you are. Check the path with `pwd` and `ls` first, and dry-run destructive helpers (`find ... -print` before `-delete`)."
+            },
+            {
+              "t": "h",
+              "x": "Links, types and sizes"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "ln -s /opt/app/releases/2026-10-04 /opt/app/current  # symlink\nls -l            # first char:  - file, d directory, l symlink\nfile archive.bin # what is this really?\nstat report.pdf  # size, owner, timestamps\ndu -sh /var/log  # disk used by a whole tree"
+            },
+            {
+              "t": "tip",
+              "x": "Symlinks are how deployments flip versions with zero downtime: point `current` at the new release folder, then restart the service. A broken symlink shows up clearly in `ls -l`."
+            }
+          ],
+          "quiz": [
+            {
+              "q": "Which command creates `/srv/app/logs` even though `/srv/app` does not exist yet?",
+              "opts": [
+                "`mkfolder /srv/app/logs`",
+                "`mkdir -p /srv/app/logs`",
+                "`touch -r /srv/app/logs`",
+                "`ln -s /srv/app/logs`"
+              ],
+              "a": 1,
+              "why": "`-p` creates missing parent directories and stays quiet if the target already exists."
+            },
+            {
+              "q": "What does `rm -rf build/` do when `build/` is the wrong directory?",
+              "opts": [
+                "It asks for confirmation first",
+                "It moves the directory to a trash folder",
+                "It deletes everything under it immediately and permanently",
+                "It fails unless you are root"
+              ],
+              "a": 2,
+              "why": "-r recurses, -f never prompts. There is no undo — always verify the path before pressing Enter."
+            }
+          ]
+        },
+        {
+          "id": "search-find",
+          "title": "Find anything: files with find, text with grep",
+          "min": 10,
+          "sum": "Answer where is it? and where is it mentioned? for any file on the machine — and act on the results safely.",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Two tools cover almost every search on a server: **find** for files, **grep** for the text inside them. Learn the four or five flags you will actually use."
+            },
+            {
+              "t": "h",
+              "x": "find: locate files by almost anything"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "find /var/log -name '*.log' -size +10M     # logs bigger than 10 MB\nfind /srv -type f -name '*.conf'            # files only, by name\nfind /srv/app -type f -mtime -7             # changed in the last 7 days\nfind /tmp -type f -mtime +30 -print         # older than 30 days: preview first\nfind /srv/app -type f -exec chown app:app {} +  # run a command per hit"
+            },
+            {
+              "t": "ul",
+              "x": [
+                "`-type f` files, `-type d` directories.",
+                "`-size +10M` bigger than 10 MB; `-size -1k` smaller than 1 KB; `+1G` gigabytes.",
+                "`-mtime -7` modified less than 7 days ago; `+7` more than 7 days ago.",
+                "`-iname` is the case-insensitive version of `-name`."
+              ]
+            },
+            {
+              "t": "warn",
+              "x": "Always run the search first (the default `-print`) and eyeball the list **before** adding `-delete` or a destructive `-exec`. `find` is a chainsaw that hides its blade until you add an action."
+            },
+            {
+              "t": "h",
+              "x": "grep: find text inside files"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "grep -rin 'timeout' /etc/nginx/   # recursive, ignore case, line numbers\ngrep -c 'ERROR' app.log           # count matching lines\ngrep -v '^#' nginx.conf           # hide comments (invert the match)\ngrep -E '50[0-9] ' access.log     # extended regex: 500 to 509"
+            },
+            {
+              "t": "h",
+              "x": "The killer combination"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "grep -rl 'old-domain.com' /etc              # which config files mention it?\nfind /srv -name '*.conf' -exec grep -l 'listen' {} +   # find, then filter by content"
+            },
+            {
+              "t": "tip",
+              "x": "`grep -rl` (recursive, list file names only) is usually the fastest path to the answer — it stops you from dumping megabytes of log lines into the terminal."
+            },
+            {
+              "t": "warn",
+              "x": "`grep -r /` will happily crawl your whole disk and take minutes. Narrow the path to the directory you suspect — `/etc/nginx`, not `/`."
+            }
+          ],
+          "quiz": [
+            {
+              "q": "Which command finds log files larger than 10 MB in /var/log?",
+              "opts": [
+                "`find /var/log -name '*.log' -size +10M`",
+                "`find /var/log -name '*.log' -bigger 10`",
+                "`ls -big /var/log/*.log`",
+                "`grep -size +10M /var/log`"
+              ],
+              "a": 0,
+              "why": "`find -size +10M` means strictly larger than 10 MB. Prefix `+` means greater than, `-` smaller than."
+            },
+            {
+              "q": "Search for 'timeout' anywhere under /etc, ignoring case, printing line numbers:",
+              "opts": [
+                "`grep -rin 'timeout' /etc`",
+                "`find /etc -timeout`",
+                "`grep -v timeout /etc`",
+                "`cat /etc/*timeout*`"
+              ],
+              "a": 0,
+              "why": "-r recurses, -i ignores case, -n prints line numbers. That trio covers most real-world greps."
+            }
+          ]
+        },
+        {
+          "id": "pipes-redirect",
+          "title": "Pipes and redirection: the superpower",
+          "min": 10,
+          "sum": "stdout, stderr, pipes and exit codes — the plumbing that turns small commands into one-liners that feel like magic.",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "The Unix philosophy in one sentence: **small tools that do one thing, connected by pipes**. Once you see I/O as plumbing, the command line becomes a Lego set."
+            },
+            {
+              "t": "h",
+              "x": "Three streams: stdin, stdout, stderr"
+            },
+            {
+              "t": "ul",
+              "x": [
+                "**stdin** (0) — input, usually your keyboard.",
+                "**stdout** (1) — normal output.",
+                "**stderr** (2) — errors. Keeping errors separate is what keeps logs readable."
+              ]
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "ls /var/log > listing.txt     # stdout to a file (overwrite)\nls /var/log >> listing.txt    # append instead of overwrite\nmycmd 2> errors.log           # send stderr to its own file\nmycmd > all.log 2>&1          # both streams into one file\nmycmd > /dev/null 2>&1        # discard everything (handy in cron)"
+            },
+            {
+              "t": "h",
+              "x": "Pipes: stdout of one command becomes stdin of the next"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "title": "The classic one-liner",
+              "x": "awk '{print $1}' access.log | sort | uniq -c | sort -nr | head -5\n# extract column 1 (IPs) → sort → count duplicates → rank → top 5"
+            },
+            {
+              "t": "p",
+              "x": "Read it as a pipeline: `awk` pulls the first column, `sort` groups equal values together, `uniq -c` counts each run, `sort -nr` ranks numerically, `head -5` keeps the winners. Five tiny tools, one answer: **your five noisiest visitors**."
+            },
+            {
+              "t": "h",
+              "x": "Handy companions"
+            },
+            {
+              "t": "ul",
+              "x": [
+                "`wc -l` — count lines.",
+                "`sort -h` — sort by human sizes (1K, 2M, 3G...).",
+                "`cut -d: -f1 /etc/passwd` — print the first colon-separated field.",
+                "`tr 'A-Z' 'a-z'` — lowercase everything passing through.",
+                "`tee disk.txt` — write to a file **and** pass the data on: `df -h | tee disk.txt`."
+              ]
+            },
+            {
+              "t": "h",
+              "x": "Exit codes, && and ||"
+            },
+            {
+              "t": "p",
+              "x": "Every command exits with a number: `0` means success, anything else is a failure. `$?` holds the last one — and the shell operators read it for you."
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "apt update && apt upgrade -y       # upgrade only if update succeeded\nsystemctl is-active nginx || echo 'nginx is DOWN'\necho $?                             # exit code of the previous command"
+            },
+            {
+              "t": "tip",
+              "x": "`grep -q pattern file` searches quietly: no output, only the exit code. Perfect for `&&` chains and scripts."
+            },
+            {
+              "t": "warn",
+              "x": "`>` opens (and truncates!) the target file **before** the command runs. `sort big.log > big.log` sorts an empty file. Use a new name or a temp file when input and output might be the same."
+            }
+          ],
+          "quiz": [
+            {
+              "q": "What is the difference between `>` and `>>`?",
+              "opts": [
+                "`>` appends, `>>` overwrites",
+                "`>` overwrites the file, `>>` appends to it",
+                "They are identical",
+                "`>>` works only with sudo"
+              ],
+              "a": 1,
+              "why": "`>` truncates the target first — one wrong path and the old contents are gone. `>>` adds to the end."
+            },
+            {
+              "q": "In `mycmd > all.log 2>&1`, where does stderr end up?",
+              "opts": [
+                "Discarded",
+                "In the terminal only",
+                "In all.log, together with stdout",
+                "In /var/log/syslog"
+              ],
+              "a": 2,
+              "why": "`2>&1` points stream 2 (stderr) at stream 1 (stdout), which is already going to all.log — so both land in the file."
+            }
+          ]
+        },
+        {
+          "id": "editors-archives",
+          "title": "Survival editing and tar archives",
+          "min": 9,
+          "sum": "Edit config files with nano or vim without panicking, and bundle files for backup or transfer with tar.",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Sooner or later you must edit a config file and bundle some files for transfer. This is the survival kit for both — no IDE required."
+            },
+            {
+              "t": "h",
+              "x": "nano: the friendly editor"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "sudo nano /etc/nginx/sites-available/default\n# Ctrl+O = save  ·  Ctrl+X = exit  ·  Ctrl+W = search"
+            },
+            {
+              "t": "h",
+              "x": "vim: worth ten minutes of your life"
+            },
+            {
+              "t": "ul",
+              "x": [
+                "`i` enters insert mode (you can type). `Esc` returns to normal mode.",
+                "`:w` saves · `:q` quits · `:wq` saves and quits · `:q!` quits and throws changes away.",
+                "`/text` searches, `n` jumps to the next hit. `dd` deletes a line, `u` undoes.",
+                "Run `vimtutor` on any server — a guided half-hour that pays for itself forever."
+              ]
+            },
+            {
+              "t": "tip",
+              "x": "Before editing a config by hand, copy it: `sudo cp nginx.conf nginx.conf.bak`. After editing, validate it: `sudo nginx -t` or `sudo sshd -t`. A syntax check beats an outage at 2 AM."
+            },
+            {
+              "t": "h",
+              "x": "tar: bundle files the server way"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "tar -czvf backup.tar.gz /srv/app          # create · gzip · verbose · file\ntar -tzf backup.tar.gz                     # list contents, no extraction\ntar -xzvf backup.tar.gz -C /restore        # extract into a directory\ntar -xzvf backup.tar.gz srv/app/index.html # extract a single file\nzip -r site.zip site/                      # zip, when Windows users are involved"
+            },
+            {
+              "t": "ul",
+              "x": [
+                "Letter mnemonic: `c` create, `x` extract, `t` list, `z` gzip, `v` talkative, `f` file. Order barely matters (`-zxvf` works fine)."
+              ]
+            },
+            {
+              "t": "warn",
+              "x": "`tar` writes paths relative to the extraction directory. Extracting a crafted archive as root in `/` can overwrite system files. Always extract with `-C` into a scratch directory first and look at what came out."
+            }
+          ],
+          "quiz": [
+            {
+              "q": "Which command extracts `backup.tar.gz` into `/restore`?",
+              "opts": [
+                "`tar -czvf backup.tar.gz /restore`",
+                "`tar -xzvf backup.tar.gz -C /restore`",
+                "`tar -tzf backup.tar.gz /restore`",
+                "`gzip -d backup.tar.gz /restore`"
+              ],
+              "a": 1,
+              "why": "`-x` extracts, `-z` handles gzip, `-C` changes to the target directory before unpacking."
+            },
+            {
+              "q": "In vim, how do you quit **without** saving changes?",
+              "opts": [
+                "`:wq`",
+                "Ctrl+X",
+                "`:q!`",
+                "`Esc` twice"
+              ],
+              "a": 2,
+              "why": "`:q!` forces a quit and discards modifications. `:wq` would save them, which is usually the opposite of what you want mid-edit."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "users",
+      "title": "Users, Groups & Permissions",
+      "icon": "👥",
+      "sum": "Know who exists on the machine, escalate to root the professional way, and give every file exactly the access it needs.",
+      "lessons": [
+        {
+          "id": "users-groups",
+          "title": "Users and groups: who is on this machine?",
+          "min": 10,
+          "sum": "Account types, the three files that define them, and how to create, inspect and remove users the right way.",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Every process runs **as some user**. Server security starts with knowing who can log in, and which account each service runs as."
+            },
+            {
+              "t": "h",
+              "x": "Who is here?"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "whoami            # current user\nid                # uid, gid and group memberships\nw                 # who is logged in right now\nlast -n 5         # the five most recent logins\ncat /etc/passwd   # every account on the system"
+            },
+            {
+              "t": "h",
+              "x": "The three files behind it all"
+            },
+            {
+              "t": "ul",
+              "x": [
+                "`/etc/passwd` — one line per account: `name:x:uid:gid:info:home:shell`. World-readable by design.",
+                "`/etc/shadow` — password hashes and expiry rules. Root-only, and that is the point.",
+                "`/etc/group` — group names plus members that are not the primary group.",
+                "uid `0` is root. Service accounts like `www-data` or `nobody` usually have `/usr/sbin/nologin` as their shell: they run services, humans cannot log in."
+              ]
+            },
+            {
+              "t": "h",
+              "x": "Create and manage a user"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "sudo useradd -m -s /bin/bash ana   # home directory + bash shell\nsudo passwd ana                    # set the password\nsudo usermod -aG sudo ana          # add to sudo group (wheel on RHEL family)\ngroups ana                         # verify memberships\nsudo userdel -r ana                # remove user and home directory"
+            },
+            {
+              "t": "tip",
+              "x": "Always use `usermod -aG`. The `-a` means **append**: typing `-G` on its own replaces the entire group list and silently locks people out of things they could do yesterday."
+            },
+            {
+              "t": "tip",
+              "x": "Give every service its own unprivileged user. If the web app is compromised, the blast radius stops at what that one account can touch."
+            }
+          ],
+          "quiz": [
+            {
+              "q": "Where are password hashes stored?",
+              "opts": [
+                "`/etc/passwd`",
+                "`/etc/shadow`",
+                "`/etc/group`",
+                "`/var/log/auth.log`"
+              ],
+              "a": 1,
+              "why": "`/etc/shadow` holds the hashes and is readable only by root. `/etc/passwd` contains account metadata but the password field just says `x`."
+            },
+            {
+              "q": "Add existing user ana to the sudo group on Ubuntu, without touching her other groups:",
+              "opts": [
+                "`usermod -G sudo ana`",
+                "`usermod -aG sudo ana`",
+                "`groupadd sudo ana`",
+                "`useradd -G ana`"
+              ],
+              "a": 1,
+              "why": "`-aG` appends. Plain `-G` replaces the whole group list — a classic way to break access by accident."
+            }
+          ]
+        },
+        {
+          "id": "sudo-root",
+          "title": "Root and sudo: power without bad habits",
+          "min": 8,
+          "sum": "Why you should not live as root, how sudo leaves receipts, and how to grant narrow powers instead of full control.",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "root (uid 0) can do anything: read every file, change every setting, kill every process. That is exactly why professionals do not live as root — they **escalate per command** with sudo."
+            },
+            {
+              "t": "h",
+              "x": "Sudo: borrowed power, with receipts"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "sudo apt update            # run one command as root\nsudo -i                    # start a root shell (know why, before you do)\nsudo -u www-data whoami    # run as another user instead\nsudo -l                    # what am I allowed to run?"
+            },
+            {
+              "t": "ul",
+              "x": [
+                "Every sudo use is logged — usually in `/var/log/auth.log` (or `/var/log/secure` on RHEL family).",
+                "Sudo credentials are cached for a few minutes, so consecutive admin commands do not re-prompt.",
+                "`visudo` checks syntax **before** saving. Use it for every sudoers edit; a broken sudoers file can lock you out of admin rights entirely."
+              ]
+            },
+            {
+              "t": "h",
+              "x": "Grant narrow powers instead of full root"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "title": "spot the difference",
+              "x": "sudo visudo -f /etc/sudoers.d/deploy\n\n# full root — convenient, terrifying:\ndeploy ALL=(ALL) ALL\n\n# narrow and auditable — restart ONE service, no password prompt:\ndeploy ALL=(ALL) NOPASSWD: /usr/bin/systemctl restart nginx"
+            },
+            {
+              "t": "tip",
+              "x": "Automation (CI jobs, deploy scripts) needs `NOPASSWD` for a specific command — that is fine. Humans get a password prompt. Resist the urge to give both the same rule."
+            },
+            {
+              "t": "warn",
+              "x": "`sudo -i` out of habit is how wrong-window `rm -rf` stories happen: a root shell ignores every file permission safety net, and there is no trail of individual commands, just one root shell."
+            }
+          ],
+          "quiz": [
+            {
+              "q": "How should an administrator do daily work on a server?",
+              "opts": [
+                "Always log in as root to save time",
+                "Log in as an unprivileged user and use sudo per command",
+                "Use root only on Fridays",
+                "Share the root password with the team"
+              ],
+              "a": 1,
+              "why": "Least privilege with per-command escalation: every action is logged, and accidents stay small."
+            },
+            {
+              "q": "Where should you edit sudo rules?",
+              "opts": [
+                "With any editor directly on /etc/sudoers",
+                "With `visudo`, which syntax-checks before saving",
+                "In /etc/passwd",
+                "With `chmod 777 /etc/sudoers` first"
+              ],
+              "a": 1,
+              "why": "`visudo` (and files in `/etc/sudoers.d/`) validates the syntax, so a typo cannot break sudo system-wide."
+            }
+          ]
+        },
+        {
+          "id": "chmod-chown",
+          "title": "chmod, chown and the permission model",
+          "min": 11,
+          "sum": "Read any permission string at a glance, set exactly the access a file needs, and understand umask, owners and groups.",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Linux permissions answer one question per file: **who can do what**. Get this model right once and you will debug 'permission denied' in seconds instead of reinstalling things."
+            },
+            {
+              "t": "h",
+              "x": "Reading `ls -l`"
+            },
+            {
+              "t": "code",
+              "lang": "text",
+              "x": "-rwxr-xr--  1 deploy  www-data  4096 Oct  4 22:10 deploy.sh\n│└┬┘└┬┘└┬┘    └owner  └group\n│ │  │  └── others: r--\n│ │  └───── group:  r-x\n│ └──────── owner:  rwx\n└────────── type: - file, d directory, l symlink"
+            },
+            {
+              "t": "ul",
+              "x": [
+                "**r**ead = 4, **w**rite = 2, e**x**ecute = 1. Add them per role: `7` = rwx, `6` = rw-, `5` = r-x, `4` = r--.",
+                "Three digits = owner / group / others. `644` means owner reads and writes; everyone else only reads."
+              ]
+            },
+            {
+              "t": "h",
+              "x": "chmod in both styles"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "chmod 644 index.html         # rw-r--r--  typical file\nchmod 755 deploy.sh          # rwxr-xr-x  scripts and directories\nchmod 600 ~/.ssh/id_ed25519  # only I may read my private key\nchmod +x backup.sh           # symbolic: add execute\nchmod u+x,g-w notes.txt      # owner +execute, group -write"
+            },
+            {
+              "t": "h",
+              "x": "chown and chgrp: change who owns it"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "sudo chown deploy:www-data -R /srv/app\nsudo chgrp www-data /srv/app/uploads"
+            },
+            {
+              "t": "p",
+              "x": "A typical web setup: files owned by the deploy user, group-owned by `www-data` (the account nginx or apache runs as), directories `755`, files `644`, secrets `600`, and your `.ssh` directory `700`."
+            },
+            {
+              "t": "h",
+              "x": "umask: the defaults for new files"
+            },
+            {
+              "t": "p",
+              "x": "New files start from `666` minus the umask, new directories from `777` minus the umask. A umask of `022` produces the familiar 644/755 pair; a stricter `027` keeps the group from writing and others out entirely."
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "umask        # show the current mask\numask 027    # for this session — put it in ~/.profile to keep it"
+            },
+            {
+              "t": "warn",
+              "x": "`chmod -R 777` is not a fix — it is a confession. World-writable files let any process rewrite your application. Find the right owner and group instead."
+            }
+          ],
+          "quiz": [
+            {
+              "q": "In symbolic form, `755` is:",
+              "opts": [
+                "`rw-r--r--`",
+                "`rwxr-xr-x`",
+                "`rwxrwxrwx`",
+                "`rwxr--r--`"
+              ],
+              "a": 1,
+              "why": "7 = rwx, 5 = r-x. So 755 expands to rwxr-xr-x: the owner can do everything, group and others can read and execute."
+            },
+            {
+              "q": "Set the owner of /srv/app to deploy and the group to www-data, recursively:",
+              "opts": [
+                "`chmod deploy:www-data /srv/app -R`",
+                "`chgrp deploy:www-data /srv/app`",
+                "`chown deploy:www-data -R /srv/app`",
+                "`usermod -G www-data -R /srv/app`"
+              ],
+              "a": 2,
+              "why": "`chown owner:group path` changes both. `chmod` only changes permission bits, never ownership."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "processes",
+      "title": "Processes & Services",
+      "icon": "⚙️",
+      "sum": "See what the machine is actually doing, stop and start things safely, and keep long-running services alive with systemd.",
+      "lessons": [
+        {
+          "id": "processes",
+          "title": "Processes, signals and load",
+          "min": 9,
+          "sum": "Inspect every running process, read load averages like a doctor reads an X-ray, and kill things without causing damage.",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Every running thing on a server is a **process** with a numeric PID. When the machine feels slow or a service hangs, this is the layer you inspect first."
+            },
+            {
+              "t": "h",
+              "x": "Look at what is running"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "ps aux                # every process, classic BSD style\nps aux | grep nginx   # the time-honoured filter\npgrep -a nginx        # PIDs plus command lines, by name\ntop                   # live view; q quits. htop is prettier\nfree -h               # memory and swap\nuptime                # uptime and load averages"
+            },
+            {
+              "t": "p",
+              "x": "**Load average** (the three numbers from `uptime` or `top`) counts processes that want CPU or are stuck in I/O, averaged over 1, 5 and 15 minutes. Compare it to the core count (`nproc`): load 2.0 on a 2-core box means fully saturated; 8.0 on an 8-core box is business as usual."
+            },
+            {
+              "t": "h",
+              "x": "Signals: ask nicely, then insist"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "kill 1234                  # SIGTERM (15): polite request to finish\nkill -9 1234               # SIGKILL: kernel kills it — no cleanup\npkill -f 'node server.js'  # kill by command pattern\nkill -HUP 1234             # SIGHUP (1): many daemons reload their config"
+            },
+            {
+              "t": "tip",
+              "x": "Always try SIGTERM first. It lets the process flush data and close connections. SIGKILL skips all cleanup and can leave stale lock files, half-written files and corrupted state behind."
+            },
+            {
+              "t": "h",
+              "x": "Foreground, background — and why services are different"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "./deploy.sh &        # start it in the background\njobs                 # what this shell has running\nCtrl+Z   then   bg   # suspend a foreground job, resume in background\nnohup ./sync.sh &    # keep going even if SSH drops\ndisown               # fully detach from this shell"
+            },
+            {
+              "t": "warn",
+              "x": "`nohup` and `&` are a stopgap: if the process crashes, nothing restarts it and nothing tells you. Anything that must keep running belongs in **systemd** — that is the next lesson."
+            }
+          ],
+          "quiz": [
+            {
+              "q": "Which signal asks a process to shut down gracefully?",
+              "opts": [
+                "`kill -9`",
+                "SIGKILL (9)",
+                "SIGTERM (15)",
+                "SIGHUP (1)"
+              ],
+              "a": 2,
+              "why": "SIGTERM lets the process save state and exit cleanly. Reserve SIGKILL for processes that ignore SIGTERM."
+            },
+            {
+              "q": "`uptime` reports a load average of 6.2 on a 2-core server. What does that mean?",
+              "opts": [
+                "Everything is fine",
+                "The machine is heavily oversubscribed — about 3× more work than it can run",
+                "Memory is exhausted",
+                "The network is down"
+              ],
+              "a": 1,
+              "why": "Load roughly tracks runnable tasks; compare it with `nproc`. 6.2 on 2 cores means a long queue — usually I/O waits or CPU hogs."
+            }
+          ]
+        },
+        {
+          "id": "systemd-services",
+          "title": "systemd: services that survive reboots",
+          "min": 11,
+          "sum": "Start, stop, reload and enable services, then turn any long-running process into a proper systemd unit of your own.",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Modern Linux boots with **systemd**: the init system starts as PID 1, then manages everything else as **units** — services, timers, mounts. One vocabulary for all of it."
+            },
+            {
+              "t": "h",
+              "x": "Everyday systemctl"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "systemctl status nginx            # state + recent log lines\nsudo systemctl start nginx        # start now\nsudo systemctl stop nginx         # stop now\nsudo systemctl restart nginx      # stop + start (connections drop)\nsudo systemctl reload nginx       # re-read config, no downtime\nsudo systemctl enable --now nginx # start now AND at every boot\nsystemctl is-enabled nginx        # will it come back after reboot?"
+            },
+            {
+              "t": "p",
+              "x": "`restart` kills the process tree and starts fresh; `reload` asks the service to re-read its config while staying up — users never notice. Use reload when supported, and `reload-or-restart` when you are not sure."
+            },
+            {
+              "t": "h",
+              "x": "Poking around"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "systemctl list-units --type=service --state=running\nsystemctl list-units --failed     # what is broken right now?\nsystemctl cat nginx               # show the unit file(s) in use\nsystemctl list-timers             # scheduled jobs (cron's sibling)"
+            },
+            {
+              "t": "h",
+              "x": "Write your own service"
+            },
+            {
+              "t": "p",
+              "x": "Any long-running process can become a real service. One unit file buys you: survives reboots, restarts on crash, logs collected automatically in the journal."
+            },
+            {
+              "t": "code",
+              "lang": "ini",
+              "title": "/etc/systemd/system/myapp.service",
+              "x": "[Unit]\nDescription=My Node API\nAfter=network.target\n\n[Service]\nUser=app\nWorkingDirectory=/srv/app\nExecStart=/usr/bin/node /srv/app/server.js\nRestart=on-failure\nEnvironment=NODE_ENV=production\n\n[Install]\nWantedBy=multi-user.target"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "sudo systemctl daemon-reload        # re-read unit files\nsudo systemctl enable --now myapp   # start it and persist it\njournalctl -u myapp -f              # watch its output live"
+            },
+            {
+              "t": "tip",
+              "x": "Run `daemon-reload` after **every** unit file edit. Forgetting it is the number-one systemd confusion — systemd is still holding the old definition in memory."
+            },
+            {
+              "t": "warn",
+              "x": "Put your units in `/etc/systemd/system/`, never in `/usr/lib/systemd/system/` — package upgrades overwrite the latter. Local changes belong in `/etc`."
+            }
+          ],
+          "quiz": [
+            {
+              "q": "Which command makes nginx start automatically after a reboot?",
+              "opts": [
+                "`systemctl start nginx`",
+                "`systemctl enable nginx`",
+                "`systemctl reload nginx`",
+                "`systemctl reboot nginx`"
+              ],
+              "a": 1,
+              "why": "`enable` links the unit into the boot targets; `start` only affects the current session. `enable --now` does both."
+            },
+            {
+              "q": "You edited `/etc/systemd/system/myapp.service`. What comes next?",
+              "opts": [
+                "Reboot the server",
+                "`systemctl daemon-reload`",
+                "`systemctl list-timers`",
+                "Nothing — systemd notices automatically"
+              ],
+              "a": 1,
+              "why": "systemd caches unit definitions. `daemon-reload` re-reads them, then restart (or reload) the service to apply."
+            }
+          ]
+        },
+        {
+          "id": "logs-cron",
+          "title": "Logs with journalctl and jobs with cron",
+          "min": 10,
+          "sum": "Read service logs like a detective, and schedule recurring jobs that actually run — and actually tell you when they fail.",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Logs are how servers talk to you. systemd captures each service's output in the **journal**; classic text logs still live under `/var/log`. And for anything that must happen on schedule, cron has been the tool since forever."
+            },
+            {
+              "t": "h",
+              "x": "journalctl: one service at a time"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "journalctl -u nginx -n 100        # last 100 lines for a unit\njournalctl -u myapp -f            # follow live (Ctrl+C stops)\njournalctl --since '1 hour ago'   # time window\njournalctl -p err -b              # errors since the last boot\njournalctl -u myapp --no-pager | tail -50"
+            },
+            {
+              "t": "h",
+              "x": "Classic log files"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "ls /var/log\nsudo tail -f /var/log/auth.log        # logins + sudo (secure on RHEL)\nsudo tail -f /var/log/nginx/access.log\n# watch which logs eat disk space:\ndu -sh /var/log/* | sort -h | tail -5"
+            },
+            {
+              "t": "h",
+              "x": "cron: schedule anything"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "crontab -e     # edit YOUR jobs  (sudo crontab -e for root's)\ncrontab -l     # list them"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "title": "crontab anatomy",
+              "x": "# ┌─ minute (0-59)\n# │ ┌─ hour (0-23)\n# │ │ ┌─ day of month (1-31)\n# │ │ │ ┌─ month (1-12)\n# │ │ │ │ ┌─ weekday (0-7, Sunday is 0 or 7)\n# │ │ │ │ │\n  30 3 * * *  /usr/local/bin/backup.sh >> /var/log/backup.log 2>&1"
+            },
+            {
+              "t": "ul",
+              "x": [
+                "Shortcuts exist: `@daily`, `@hourly`, `@reboot`.",
+                "Job output is emailed — which in practice means **lost**. Always redirect: `>> /var/log/job.log 2>&1`.",
+                "Cron runs with a minimal environment. **Use absolute paths** in jobs, scripts and configs.",
+                "System-wide jobs can live in `/etc/cron.d/`, and modern replacements use systemd timers — check with `systemctl list-timers`."
+              ]
+            },
+            {
+              "t": "tip",
+              "x": "Test every script by hand first, then in cron. The classic silent failure is a script that works in your shell because your interactive `PATH` was full of extras — cron's is almost empty."
+            },
+            {
+              "t": "warn",
+              "x": "A cron job that fails silently for a month is worse than no cron job. At minimum, log output with a timestamp; better still, make failures mail you or hit a heartbeat URL."
+            }
+          ],
+          "quiz": [
+            {
+              "q": "Show the last 100 log lines for the `myapp` service:",
+              "opts": [
+                "`tail -100 /var/log/myapp.log`",
+                "`journalctl -u myapp -n 100`",
+                "`systemctl logs myapp`",
+                "`grep myapp /var/log/syslog`"
+              ],
+              "a": 1,
+              "why": "`-u` selects the unit and `-n 100` limits to the last 100 entries. Add `-f` to follow in real time."
+            },
+            {
+              "q": "Which crontab entry runs a backup every day at 03:30?",
+              "opts": [
+                "`3 30 * * * backup.sh`",
+                "`30 3 * * * backup.sh`",
+                "`* * 3 30 * backup.sh`",
+                "`@daily-3:30 backup.sh`"
+              ],
+              "a": 1,
+              "why": "Fields run minute, hour, day, month, weekday. So `30 3 * * *` means minute 30 of hour 3, every day."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "network",
+      "title": "Networking & Remote Access",
+      "icon": "🌐",
+      "sum": "Understand addresses, ports and DNS, log in with SSH keys, and move files around reliably.",
+      "lessons": [
+        {
+          "id": "network-basics",
+          "title": "Addresses, ports and DNS",
+          "min": 10,
+          "sum": "Check the four basics in the right order — address, route, listener, name — and debug 'it does not load' without guessing.",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Servers exist to talk to other machines. When something 'is not working', disciplined people check four things in order instead of guessing. This lesson is the checklist."
+            },
+            {
+              "t": "h",
+              "x": "1) Address and route"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "ip a                    # interfaces and IP addresses\nip r                    # routing table; 'default via' is the gateway\nhostname -I             # just the IPs\nping -c 4 1.1.1.1       # is the network alive at all?\ntraceroute example.com  # hop by hop; find where it stalls"
+            },
+            {
+              "t": "h",
+              "x": "2) Listeners: is anything actually listening?"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "ss -tulpn               # TCP+UDP listeners with process names\nss -tulpn | grep ':443' # who owns port 443?\ncurl -I http://localhost:3000   # does the app answer on loopback?"
+            },
+            {
+              "t": "ul",
+              "x": [
+                "Ports worth memorising: **22** SSH · **80** HTTP · **443** HTTPS · **5432** PostgreSQL · **3306** MySQL · **6379** Redis · **3000/8000** dev apps.",
+                "`127.0.0.1` is **loopback** — reachable only from this machine. `0.0.0.0` means every interface. An app bound to 127.0.0.1 is invisible to the outside no matter what the firewall says."
+              ]
+            },
+            {
+              "t": "h",
+              "x": "3) DNS: is the name resolving?"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "dig +short example.com   # what IP does the name point to?\ncat /etc/resolv.conf     # which resolvers are configured?\ncurl -sv https://example.com 2>&1 | head -25   # full request trace"
+            },
+            {
+              "t": "h",
+              "x": "The debugging order that saves hours"
+            },
+            {
+              "t": "ul",
+              "x": [
+                "Is the process running? → `systemctl status myapp`",
+                "Is it listening? → `ss -tulpn | grep myport`",
+                "Does it answer locally? → `curl -I http://localhost:myport`",
+                "Is the firewall open? → `sudo ufw status`",
+                "Does the name resolve from outside? → `dig +short mydomain`"
+              ]
+            },
+            {
+              "t": "tip",
+              "x": "Each step eliminates a layer: process, socket, loopback, network stack, name. Fix the first step that fails and re-run the list — never skip downwards."
+            }
+          ],
+          "quiz": [
+            {
+              "q": "Which command shows listening ports along with the process that owns each one?",
+              "opts": [
+                "`ip a`",
+                "`ss -tulpn`",
+                "`dig -x`",
+                "`uptime`"
+              ],
+              "a": 1,
+              "why": "`ss -tulpn` lists TCP and UDP listeners (−t −u), listening only (−l), with process info (−p) and numeric ports (−n)."
+            },
+            {
+              "q": "An app is bound to 127.0.0.1:8080. Can a client on the internet reach it?",
+              "opts": [
+                "Yes, if the firewall allows 8080",
+                "Yes, always",
+                "No — loopback is only reachable from the machine itself",
+                "Only over HTTPS"
+              ],
+              "a": 2,
+              "why": "Binding to the loopback interface means the socket never appears on the public interface. Bind to 0.0.0.0 (or the specific public IP) to accept outside connections."
+            }
+          ]
+        },
+        {
+          "id": "ssh",
+          "title": "SSH keys: log in like a professional",
+          "min": 11,
+          "sum": "Create a key pair, install the public half on servers, shortcut it with ~/.ssh/config, then harden the daemon safely.",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "SSH is your hands on the server. Passwords get guessed and brute-forced constantly; **keys** cannot be guessed at all. Set up key login first, then lock the door behind you."
+            },
+            {
+              "t": "h",
+              "x": "Keys in sixty seconds"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "# on YOUR laptop:\nssh-keygen -t ed25519 -C 'you@laptop'   # creates ~/.ssh/id_ed25519 (+ .pub)\nssh-copy-id deploy@203.0.113.10         # installs the public key on the server\nssh deploy@203.0.113.10                 # now logs in without a password"
+            },
+            {
+              "t": "ul",
+              "x": [
+                "`id_ed25519` is the **private key**: never leaves your laptop, never copied to a server, never committed to git. Keep it at `chmod 600`.",
+                "`id_ed25519.pub` is the **public key**: safe to share; it lands in `~/.ssh/authorized_keys` on each server you trust.",
+                "ed25519 is shorter and stronger than RSA. If you must use RSA: `-t rsa -b 4096`."
+              ]
+            },
+            {
+              "t": "h",
+              "x": "A config file that pays rent"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "title": "~/.ssh/config",
+              "x": "Host web\n  HostName 203.0.113.10\n  User deploy\n  IdentityFile ~/.ssh/id_ed25519\n\n# afterwards, just:   ssh web"
+            },
+            {
+              "t": "h",
+              "x": "Hardening the server: /etc/ssh/sshd_config"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "PasswordAuthentication no\nPermitRootLogin no\nAllowUsers deploy\n\n# validate, then apply:\nsudo sshd -t && sudo systemctl reload sshd"
+            },
+            {
+              "t": "warn",
+              "x": "**Never close your working session until key login succeeds in a second terminal.** Open a new window, run `ssh web`, and only then disable password auth. Locking yourself out of a remote server is a rite of passage you can skip."
+            },
+            {
+              "t": "tip",
+              "x": "Keep a passphrase on your key and let the agent remember it for the session: `eval \"$(ssh-agent -s)\"` then `ssh-add ~/.ssh/id_ed25519`. Key-grade security, password-grade convenience."
+            }
+          ],
+          "quiz": [
+            {
+              "q": "Which piece ends up on the server for key-based login?",
+              "opts": [
+                "The private key, in `~/.ssh/id_ed25519`",
+                "The public key, inside `~/.ssh/authorized_keys`",
+                "Both keys",
+                "`/etc/ssh/sshd_config`"
+              ],
+              "a": 1,
+              "why": "The server stores public keys; your laptop proves ownership of the matching private key during login. The private key never travels."
+            },
+            {
+              "q": "Safe order for disabling password logins?",
+              "opts": [
+                "Set PasswordAuthentication no first, then test",
+                "Test key login in a second session, then set PasswordAuthentication no and reload sshd",
+                "Disable SSH and use the console",
+                "Change the SSH port instead"
+              ],
+              "a": 1,
+              "why": "Prove the new path works while the old one is still open — then close the old one. One terminal too few is how people lock themselves out."
+            }
+          ]
+        },
+        {
+          "id": "file-transfer",
+          "title": "Moving files: scp, rsync, sftp",
+          "min": 9,
+          "sum": "Ship code, pull logs and sync trees between machines — with dry runs before anything destructive.",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "You will move files between machines constantly: deploy code, pull logs, ship a database dump. Each tool has a sweet spot — know which one to reach for."
+            },
+            {
+              "t": "h",
+              "x": "Pick the right tool"
+            },
+            {
+              "t": "ul",
+              "x": [
+                "**scp** — one file or one small directory, right now. Dead simple, no resume.",
+                "**rsync** — everything bigger: whole trees, only transfers changes, resumable, can mirror deletions.",
+                "**sftp** — interactive browsing and transfers when you want to walk the tree first."
+              ]
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "scp report.pdf deploy@web:/srv/reports/       # one file up\nscp deploy@web:/var/log/nginx/access.log ./   # one file down\nscp -r site/ deploy@web:/var/www/              # small directory\n\nrsync -avz --progress site/ deploy@web:/var/www/  # fast sync of a tree\nrsync -avn site/ deploy@web:/var/www/             # dry run: what WOULD change?\nrsync -avz --delete site/ deploy@web:/var/www/    # mirror, deleting extras\nrsync -avz deploy@web:/var/log/ ./logs/           # pull logs down"
+            },
+            {
+              "t": "p",
+              "x": "The **trailing slash matters**: `site/` copies the *contents* of site; `site` without the slash copies the directory itself into the destination."
+            },
+            {
+              "t": "h",
+              "x": "Sanity rules"
+            },
+            {
+              "t": "ul",
+              "x": [
+                "Dry-run (`-n`) whenever `--delete` is on the table — see the plan before it executes.",
+                "`-P` gives per-file progress and lets interrupted transfers resume.",
+                "Exclude the noise on code deploys: `--exclude '.git' --exclude 'node_modules'`.",
+                "On slow or flaky links, rsync beats scp every time: it continues where it stopped."
+              ]
+            },
+            {
+              "t": "tip",
+              "x": "`rsync -a` preserves permissions, timestamps and symlinks. Add hardlinks, ACLs and attributes (`-aHAX`) when you are building serious backups."
+            },
+            {
+              "t": "warn",
+              "x": "`rsync --delete` makes the destination **exactly** match the source — deletions included. One typo in the source path can therefore wipe the destination. Dry-run it. Then dry-run it again."
+            }
+          ],
+          "quiz": [
+            {
+              "q": "Which tool resumes interrupted transfers and only sends changed parts?",
+              "opts": [
+                "`scp`",
+                "`rsync`",
+                "`sftp`",
+                "`ftp`"
+              ],
+              "a": 1,
+              "why": "rsync compares both ends and transfers only the differences — ideal for large trees and unstable connections."
+            },
+            {
+              "q": "What is the difference between `rsync -a site/ dest/` and `rsync -a site dest/`?",
+              "opts": [
+                "No difference",
+                "The trailing slash copies the contents of site; without it, the whole site directory is placed inside dest",
+                "The trailing slash makes it recursive",
+                "Without the slash it only copies files, not subdirectories"
+              ],
+              "a": 1,
+              "why": "With `site/`, dest receives site's contents directly. Without it, you get dest/site/… — the classic rsync gotcha."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "security",
+      "title": "Server Setup & Security",
+      "icon": "🛡️",
+      "sum": "Install and update software the right way, serve a real website with nginx and TLS, then lock the machine down and back it up.",
+      "lessons": [
+        {
+          "id": "packages",
+          "title": "Packages: install, update, inspect",
+          "min": 9,
+          "sum": "Use the package manager for everything, read the Debian vs Red Hat differences, and let security updates install themselves.",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Every piece of software on the server — nginx, PostgreSQL, even your shell — came from a **package manager** pulling signed packages from repositories. It is how you install, update and remove software without chasing downloads."
+            },
+            {
+              "t": "h",
+              "x": "The everyday commands (Debian/Ubuntu: apt)"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "sudo apt update              # refresh the package lists (no upgrades yet)\nsudo apt upgrade -y          # install available upgrades\nsudo apt install nginx       # install; dependencies come along automatically\nsudo apt remove nginx        # uninstall (purge also removes its configs)\napt list --upgradable        # what is waiting to be updated?"
+            },
+            {
+              "t": "p",
+              "x": "`update` refreshes the catalog; `upgrade` installs from it. They are two different jobs — forgetting `update` first is why people 'cannot find' a package that clearly exists."
+            },
+            {
+              "t": "h",
+              "x": "Red Hat family: dnf"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "sudo dnf upgrade --refresh   # update everything\nsudo dnf install nginx\nsudo dnf remove nginx\ndnf info nginx               # description + version"
+            },
+            {
+              "t": "h",
+              "x": "Search and inspect"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "apt search 'web server'    # search names and descriptions\napt show nginx             # version, size, dependencies, homepage\ndpkg -l | grep nginx       # what version is actually installed?\nnginx -v                   # ask the software itself"
+            },
+            {
+              "t": "h",
+              "x": "Let security updates install themselves"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "sudo apt install unattended-upgrades\nsudo dpkg-reconfigure --priority=low unattended-upgrades\n\n# later, check what it did:\ncat /var/log/unattended-upgrades/unattended-upgrades.log"
+            },
+            {
+              "t": "warn",
+              "x": "Only add third-party repositories (PPAs, custom apt sources) that you genuinely trust. A repository is software installation with root rights — treat adding one like handing someone your SSH key."
+            }
+          ],
+          "quiz": [
+            {
+              "q": "What does `sudo apt update` actually do?",
+              "opts": [
+                "Installs available upgrades",
+                "Refreshes the list of available packages and versions",
+                "Updates the kernel",
+                "Upgrades the distribution to the next release"
+              ],
+              "a": 1,
+              "why": "`update` syncs the catalog from repositories. `upgrade` (or `full-upgrade`) installs newer versions — usually the next thing you run."
+            },
+            {
+              "q": "Which command shows the version of nginx that is installed right now?",
+              "opts": [
+                "`apt show nginx`",
+                "`apt search nginx`",
+                "`dpkg -l | grep nginx`",
+                "`apt list --upgradable`"
+              ],
+              "a": 2,
+              "why": "`dpkg -l` lists installed packages and their versions. `apt show` describes what the repository offers, not what is on disk."
+            }
+          ]
+        },
+        {
+          "id": "web-server",
+          "title": "Serving a real site with nginx",
+          "min": 12,
+          "sum": "Install nginx, serve a static site, reverse-proxy an app on port 3000, and add free TLS with certbot.",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Time to serve something real. nginx is the workhorse of the modern web: static file server, reverse proxy and TLS terminator in one small binary."
+            },
+            {
+              "t": "h",
+              "x": "Install and check"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "sudo apt update && sudo apt install -y nginx\nsudo systemctl enable --now nginx\ncurl -I http://localhost\n# → HTTP/1.1 200 OK   ·   Server: nginx"
+            },
+            {
+              "t": "h",
+              "x": "Serve a static site"
+            },
+            {
+              "t": "p",
+              "x": "On Debian/Ubuntu, sites live in `/etc/nginx/sites-available/` and are switched on by symlinking into `sites-enabled/` — exactly the symlink pattern you already know."
+            },
+            {
+              "t": "code",
+              "lang": "nginx",
+              "title": "/etc/nginx/sites-available/mysite",
+              "x": "server {\n    listen 80;\n    server_name example.com www.example.com;\n\n    root /var/www/mysite;\n    index index.html;\n\n    location / {\n        try_files $uri $uri/ =404;\n    }\n}"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "sudo ln -s /etc/nginx/sites-available/mysite /etc/nginx/sites-enabled/\nsudo mkdir -p /var/www/mysite\necho 'hello from nginx' | sudo tee /var/www/mysite/index.html\nsudo nginx -t && sudo systemctl reload nginx   # test FIRST, then reload"
+            },
+            {
+              "t": "h",
+              "x": "Reverse proxy: put nginx in front of your app"
+            },
+            {
+              "t": "p",
+              "x": "Apps usually listen on a high port on loopback (say 3000). nginx accepts public traffic on 80/443 and forwards it — adding TLS, compression and caching, and giving you one place to manage domains."
+            },
+            {
+              "t": "code",
+              "lang": "nginx",
+              "x": "location / {\n    proxy_pass http://127.0.0.1:3000;\n    proxy_set_header Host $host;\n    proxy_set_header X-Real-IP $remote_addr;\n}"
+            },
+            {
+              "t": "h",
+              "x": "TLS in three commands"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "sudo apt install certbot python3-certbot-nginx\nsudo certbot --nginx -d example.com -d www.example.com\n# certbot edits the vhost, fetches the certificate, sets up auto-renewal\nsystemctl list-timers | grep certbot   # the renewal timer"
+            },
+            {
+              "t": "tip",
+              "x": "`nginx -t` before every reload, and `journalctl -u nginx -n 50` when it misbehaves. A wrong `proxy_pass` port is the most common culprit by far."
+            },
+            {
+              "t": "warn",
+              "x": "Keep the site root owned by your deploy user but **readable** by the nginx user (`www-data`). The web server must be able to read files — never to write them."
+            }
+          ],
+          "quiz": [
+            {
+              "q": "Which command validates nginx configuration before you reload?",
+              "opts": [
+                "`nginx -v`",
+                "`nginx -t`",
+                "`systemctl check nginx`",
+                "`journalctl -u nginx`"
+              ],
+              "a": 1,
+              "why": "`nginx -t` parses the config and reports syntax errors — a reload with a broken config takes the site down."
+            },
+            {
+              "q": "What does a reverse proxy do?",
+              "opts": [
+                "Serves only static files",
+                "Accepts client traffic and forwards it to your app, adding TLS and control",
+                "Replaces the need for a firewall",
+                "Caches DNS lookups"
+              ],
+              "a": 1,
+              "why": "nginx terminates the public connection and proxies to the app on loopback — the app stays hidden, and TLS/compression/routing live in one place."
+            },
+            {
+              "q": "On Ubuntu, where do site configurations live before being enabled?",
+              "opts": [
+                "`/etc/nginx/sites-available/`",
+                "`/var/www/nginx/`",
+                "`/etc/nginx/conf.d` only",
+                "`/usr/share/nginx`"
+              ],
+              "a": 0,
+              "why": "Sites live in `sites-available/` and are activated with a symlink into `sites-enabled/` — easy to disable without deleting."
+            }
+          ]
+        },
+        {
+          "id": "firewall",
+          "title": "Firewalls: close everything, open what you need",
+          "min": 10,
+          "sum": "Default-deny with ufw or firewalld, keep SSH open, and remember the second firewall waiting in the cloud dashboard.",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "A firewall is the list of doors that exist on your server. The professional default: **close everything**, then open exactly what is needed — starting with SSH, or you will lock yourself out of your own machine."
+            },
+            {
+              "t": "h",
+              "x": "ufw: the friendly firewall (Ubuntu/Debian)"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "sudo ufw allow OpenSSH     # FIRST: keep your own door open\nsudo ufw allow 80/tcp\nsudo ufw allow 443/tcp\nsudo ufw enable\nsudo ufw status verbose     # what is open, and the default policy\nsudo ufw delete allow 80/tcp                        # remove a rule\nsudo ufw allow from 203.0.113.7 to any port 5432    # DB for one host only"
+            },
+            {
+              "t": "h",
+              "x": "firewalld: the Red Hat family equivalent"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "sudo firewall-cmd --permanent --add-service=http\nsudo firewall-cmd --permanent --add-service=https\nsudo firewall-cmd --reload\nsudo firewall-cmd --list-all"
+            },
+            {
+              "t": "h",
+              "x": "How to think about a firewall"
+            },
+            {
+              "t": "ul",
+              "x": [
+                "Open by **service** (`OpenSSH`, `http`) or by **port** (`443/tcp`). Both styles are fine.",
+                "Anything not explicitly allowed is dropped. That is the whole point.",
+                "Databases should almost never answer from the entire internet. Allow the one host that needs access, not `0.0.0.0/0`.",
+                "Compare two lists regularly: what is listening (`ss -tulpn`) versus what is open (`ufw status`). They should match closely."
+              ]
+            },
+            {
+              "t": "warn",
+              "x": "Enabling a firewall over SSH with the wrong rules is how people lose access to servers. Allow SSH **first**, then enable — and keep your provider's console open in another tab the first time."
+            },
+            {
+              "t": "tip",
+              "x": "Cloud servers usually have a **second firewall**: the security group in the provider's dashboard. A port open in `ufw` but closed in the security group is still unreachable. Check both layers."
+            }
+          ],
+          "quiz": [
+            {
+              "q": "Which rule must exist before you run `sudo ufw enable` on a remote server?",
+              "opts": [
+                "`sudo ufw allow 80/tcp`",
+                "`sudo ufw allow OpenSSH`",
+                "`sudo ufw disable`",
+                "`sudo ufw delete allow 22`"
+              ],
+              "a": 1,
+              "why": "Without an SSH rule, enabling the default-deny firewall cuts the connection you are using to enable it."
+            },
+            {
+              "q": "A port is open in ufw but unreachable from the internet. Most likely reason?",
+              "opts": [
+                "ufw is broken",
+                "The cloud provider's security group (the second firewall) does not allow it",
+                "DNS is misconfigured",
+                "The service is on port 80"
+              ],
+              "a": 1,
+              "why": "Cloud VMs typically filter traffic twice: once in the provider network layer and once on the host. Both must allow the port."
+            }
+          ]
+        },
+        {
+          "id": "hardening-backups",
+          "title": "Hardening habits and backups worth the name",
+          "min": 12,
+          "sum": "Five habits that keep a server safe over years, fail2ban against brute-forcers, and backups with the 3-2-1 rule.",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "A fresh server is a stranger; a managed server is a home. Five habits turn one into the other — and the last one matters because the first four can still fail."
+            },
+            {
+              "t": "h",
+              "x": "The five habits"
+            },
+            {
+              "t": "ul",
+              "x": [
+                "**Patch automatically.** Unattended upgrades plus reboots when the kernel changes. Most breaches are known bugs fixed months earlier.",
+                "**Minimise exposure.** Nothing listens that does not have to (`ss -tulpn`), the firewall is default-deny, SSH is key-only.",
+                "**Least privilege.** Services run as their own users, humans escalate with sudo, nothing runs as root that does not need to.",
+                "**Watch.** Check failed logins (`/var/log/auth.log`), let fail2ban punish repeat offenders, and keep one outside uptime check.",
+                "**Back up.** Assume disk failure, fat fingers and ransomware. And assume your restore will be tested — an untested backup is a rumour."
+              ]
+            },
+            {
+              "t": "h",
+              "x": "fail2ban: automatic banning"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "sudo apt install fail2ban\nsudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local   # local overrides\n\n# in jail.local:\n[sshd]\nenabled = true\nmaxretry = 5\nbantime = 1h\n\nsudo systemctl enable --now fail2ban\nsudo fail2ban-client status sshd    # see bans and current blocks"
+            },
+            {
+              "t": "h",
+              "x": "Backups worth the name: 3-2-1"
+            },
+            {
+              "t": "ul",
+              "x": [
+                "**3** copies of the data, **2** different media, **1** off-site. A backup on the same disk is just a copy of the accident.",
+                "Automated via cron or a systemd timer — discipline is not a backup strategy.",
+                "Versioned: never overwrite yesterday. A corrupted file syncs its corruption to every destination instantly.",
+                "Restores are tested. Untested backups are decoration."
+              ]
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "title": "Space-efficient snapshots",
+              "x": "rsync -a --delete --link-dest=/backups/latest /srv/app/ /backups/2026-10-04/\n# unchanged files become hardlinks → a full-looking snapshot at near-zero cost\nls -l /backups/    # each dated folder looks complete; the disk only stores changes"
+            },
+            {
+              "t": "tip",
+              "x": "For the off-site copy, prefer a **pull**: the backup host connects out and fetches. The production server then holds no credentials to your backup infrastructure — the most valuable target stays out of reach."
+            },
+            {
+              "t": "warn",
+              "x": "Never call something a backup system until you have restored from it at least once — one file, then one directory, onto a scratch machine. Do it before the day you really need it, not during."
+            }
+          ],
+          "quiz": [
+            {
+              "q": "What does the 3-2-1 rule mean?",
+              "opts": [
+                "3 servers, 2 admins, 1 password manager",
+                "3 copies of data, on 2 kinds of media, with 1 off-site",
+                "3 backups per day, 2 per week, 1 per month",
+                "3 disks in RAID, 2 replicas, 1 spare"
+              ],
+              "a": 1,
+              "why": "Three copies guard against corruption, two media types against a bad disk batch, and one off-site copy against fire, theft and ransomware."
+            },
+            {
+              "q": "You have automated backups but never restored anything. Which statement is true?",
+              "opts": [
+                "Backups are complete",
+                "The backups are unverified — restore one before trusting them",
+                "Restores are unnecessary if the job exits 0",
+                "You should back up twice as often"
+              ],
+              "a": 1,
+              "why": "An exit code of 0 only proves the script ran. Only a restore proves the data is there and readable."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "scripting",
+      "title": "Shell Scripting",
+      "icon": "📜",
+      "sum": "Turn your command line knowledge into reusable scripts with variables, control flow and honest error handling.",
+      "lessons": [
+        {
+          "id": "script-basics",
+          "title": "Your first bash script",
+          "min": 10,
+          "sum": "Shebangs, variables, quoting and exit codes — the anatomy every good script shares.",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "The moment you type the same three commands twice, a script starts paying for itself. Bash is already installed on every server — no runtime to deploy, no excuses."
+            },
+            {
+              "t": "h",
+              "x": "A small, complete example"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "title": "backup-notes.sh",
+              "x": "#!/usr/bin/env bash\nset -euo pipefail        # stop on errors, unset vars, failing pipes\n\nNAME=\"demo\"\nTARGET=\"/srv/app\"\nTODAY=$(date +%F)\n\necho \"Backing up $TARGET\"\ntar -czf \"/tmp/$NAME-$TODAY.tar.gz\" \"$TARGET\"\necho \"Done: /tmp/$NAME-$TODAY.tar.gz\""
+            },
+            {
+              "t": "h",
+              "x": "Make it runnable"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "chmod +x backup-notes.sh   # sets the execute bit\n./backup-notes.sh          # run it\nbash backup-notes.sh       # or run without the bit\nbash -x backup-notes.sh    # trace each command as it runs (debugging)"
+            },
+            {
+              "t": "h",
+              "x": "Variables and quoting"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "NAME='web-01'          # no spaces around the equals sign!\necho \"Hello $NAME\"     # double quotes: variable expands\necho 'Hello $NAME'     # single quotes: literal text\necho \"${NAME}_bak\"     # braces mark where the name ends\n\necho \"script: $0 · first arg: $1 · all args: $@ · count: $#\"\nreadonly LOG_DIR=/var/log"
+            },
+            {
+              "t": "h",
+              "x": "The safety header: set -euo pipefail"
+            },
+            {
+              "t": "ul",
+              "x": [
+                "`set -e` — exit immediately when a command fails.",
+                "`set -u` — treat undefined variables as errors (typos stop the script instead of silently doing nothing).",
+                "`set -o pipefail` — a pipeline fails if **any** stage fails, not just the last one.",
+                "Exit codes: `0` = success, non-zero = failure. Cron, CI and other scripts read these — end honestly."
+              ]
+            },
+            {
+              "t": "tip",
+              "x": "Prefer `#!/usr/bin/env bash` over `#!/bin/bash`: the script then uses whichever bash is first on the PATH, which keeps it portable to BSD and macOS machines."
+            },
+            {
+              "t": "warn",
+              "x": "Never `eval` input you did not construct, and always quote variables: `rm -rf \"$DIR\"/` with an empty `DIR` is the classic disaster. `set -u` exists precisely for this."
+            }
+          ],
+          "quiz": [
+            {
+              "q": "What does the `set -euo pipefail` line protect you from?",
+              "opts": [
+                "Slow scripts",
+                "Continuing after failures, undefined variables, and hidden pipeline errors",
+                "Missing packages",
+                "Permission errors, automatically fixing them"
+              ],
+              "a": 1,
+              "why": "It is the three-part seatbelt of bash: fail fast, catch typos, and don't let a pipeline hide a failing stage."
+            },
+            {
+              "q": "How does a script signal failure to whatever called it?",
+              "opts": [
+                "Printing an error to the screen",
+                "Exiting with a non-zero code",
+                "Writing to a log file",
+                "Sending a signal with kill"
+              ],
+              "a": 1,
+              "why": "The exit code is the contract. `exit 1` (or any non-zero) makes `&&` chains, cron and CI treat the run as failed."
+            }
+          ]
+        },
+        {
+          "id": "control-flow",
+          "title": "Conditions, loops and functions",
+          "min": 10,
+          "sum": "Make scripts think: if/else, case, loops, functions and the trap that cleans up after you.",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Scripts become programs when they can make decisions and repeat work. That is all control flow is: conditions, loops, and a little tidying up afterwards."
+            },
+            {
+              "t": "h",
+              "x": "Conditions"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "if [ ! -d \"$TARGET\" ]; then\n  echo \"missing: $TARGET\" >&2\n  exit 1\nfi\n\nif grep -q 'ERROR' \"$LOG\"; then\n  echo 'errors found in the log'\nelse\n  echo 'all clean'\nfi"
+            },
+            {
+              "t": "ul",
+              "x": [
+                "File tests: `-f` exists and is a file · `-d` directory · `-z` string empty · `-n` string not empty.",
+                "Comparisons: `[ \"$a\" = \"$b\" ]` strings · `[ \"$n\" -gt 5 ]` numbers (`-gt -lt -ge -le -eq -ne`).",
+                "Combine tests with separate brackets: `[ -f \"$f\" ] && [ -r \"$f\" ]` — not `-a` inside one bracket."
+              ]
+            },
+            {
+              "t": "h",
+              "x": "Loops"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "for site in /var/www/*; do\n  echo \"site: $site ($(du -sh \"$site\" | cut -f1))\"\ndone\n\nwhile read -r host; do\n  echo \"checking $host\"\ndone < server-list.txt\n\nfor i in 1 2 3; do echo \"attempt $i\"; done"
+            },
+            {
+              "t": "h",
+              "x": "case: multi-way decisions"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "case \"$1\" in\n  start)   systemctl start myapp ;;\n  stop)    systemctl stop myapp ;;\n  restart) systemctl restart myapp ;;\n  *)       echo \"usage: $0 {start|stop|restart}\" >&2; exit 2 ;;\nesac"
+            },
+            {
+              "t": "h",
+              "x": "Functions and traps"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "log() { echo \"[$(date '+%F %T')] $*\"; }\n\nTMP=$(mktemp)\ncleanup() { rm -f \"$TMP\"; }\ntrap cleanup EXIT     # runs on success, failure, or Ctrl+C\n\nlog 'starting work'\n# ... your real script here"
+            },
+            {
+              "t": "tip",
+              "x": "`trap cleanup EXIT` is the mark of a careful script: temp files, lock files and partial downloads get removed no matter how the script ends — including when it crashes."
+            },
+            {
+              "t": "warn",
+              "x": "Never loop over a file with `for line in $(cat file)` — it splits on spaces, not lines. Use `while read -r line; do ... done < file` instead."
+            }
+          ],
+          "quiz": [
+            {
+              "q": "Which test is true only when `$PATHVAR` points to an existing directory?",
+              "opts": [
+                "`[ -f \"$PATHVAR\" ]`",
+                "`[ -d \"$PATHVAR\" ]`",
+                "`[ -z \"$PATHVAR\" ]`",
+                "`[ -x \"$PATHVAR\" ]`"
+              ],
+              "a": 1,
+              "why": "`-d` tests for a directory; `-f` is for regular files; `-z` checks for an empty string."
+            },
+            {
+              "q": "How do you safely iterate over the lines of a file?",
+              "opts": [
+                "`for line in $(cat file)`",
+                "`while read -r line; do ...; done < file`",
+                "`cat file | for line`",
+                "`foreach line in file`"
+              ],
+              "a": 1,
+              "why": "`while read -r` preserves lines with spaces and special characters. `for ... $(cat file)` word-splits and mangles them."
+            }
+          ]
+        },
+        {
+          "id": "backup-project",
+          "title": "Project: a backup script you can keep",
+          "min": 12,
+          "sum": "Combine everything into a real script: error handling, logging, rotation, cron scheduling — and the discipline to test it.",
+          "blocks": [
+            {
+              "t": "p",
+              "x": "Time to combine everything you have learned into one artifact: a backup script with logging, rotation and honest error handling. Copy it, change two paths, and it is yours."
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "title": "/usr/local/bin/backup-app.sh",
+              "x": "#!/usr/bin/env bash\nset -euo pipefail\n\nSRC=\"/srv/app\"\nDEST=\"/backups/app\"\nKEEP=7\nSTAMP=$(date +%F_%H%M)\nLOG=\"/var/log/backup-app.log\"\n\nlog() { echo \"[$(date '+%F %T')] $*\" | tee -a \"$LOG\"; }\n\nif [ ! -d \"$SRC\" ]; then\n  log \"ERROR: source $SRC is missing\"\n  exit 1\nfi\n\nmkdir -p \"$DEST/$STAMP\"\nlog \"start: $SRC -> $DEST/$STAMP\"\n\nrsync -a --delete \"$SRC/\" \"$DEST/$STAMP/\"\n\n# rotation: keep the newest $KEEP snapshots, remove the rest\nls -1dt \"$DEST\"/*/ | tail -n +$((KEEP + 1)) | xargs -r rm -rf\n\nlog \"done: $(du -sh \"$DEST/$STAMP\" | cut -f1) archived\""
+            },
+            {
+              "t": "h",
+              "x": "What each piece buys you"
+            },
+            {
+              "t": "ul",
+              "x": [
+                "`set -euo pipefail` plus the source check: it fails loudly instead of quietly producing a series of empty backups.",
+                "`log()` with `tee -a`: every line goes to stdout **and** to the log file — cron output and a paper trail in one.",
+                "A timestamped destination directory: each run is a new snapshot; nothing overwrites yesterday.",
+                "Rotation: `ls -1dt` sorts by time, `tail -n +8` skips the newest seven, `xargs -r rm -rf` deletes the rest. The `-r` means do nothing on an empty list — it has prevented many disasters."
+              ]
+            },
+            {
+              "t": "h",
+              "x": "Install it properly"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "x": "sudo install -m 755 backup-app.sh /usr/local/bin/backup-app.sh\nsudo /usr/local/bin/backup-app.sh     # run once by hand — always\n\nsudo crontab -e\n# add:\n0 3 * * * /usr/local/bin/backup-app.sh >> /var/log/backup-app.log 2>&1\n\ntail -f /var/log/backup-app.log       # watch the next run land"
+            },
+            {
+              "t": "h",
+              "x": "Level it up later"
+            },
+            {
+              "t": "ul",
+              "x": [
+                "Switch to `--link-dest` snapshots (previous module) when disk space matters.",
+                "Push one copy off-site daily — pull, not push, when you can.",
+                "Add a heartbeat: alert when the last successful run is older than 26 hours.",
+                "Run a restore drill on a scratch machine. Only then may you call it a backup system."
+              ]
+            },
+            {
+              "t": "tip",
+              "x": "Put this script in version control. The backup script is the one script on your server that must still work two years from now — treat it with the respect you would give production code."
+            },
+            {
+              "t": "warn",
+              "x": "Test with a **scratch destination** the first time. A `--delete` pointed at the wrong path does not warn you; it simply makes the mistake perfectly synchronised."
+            }
+          ],
+          "quiz": [
+            {
+              "q": "Why run the script by hand before installing the cron entry?",
+              "opts": [
+                "To make it executable",
+                "Because cron failures are silent — a manual run proves paths, permissions and output work",
+                "Cron cannot run scripts that were never run manually",
+                "To warm up the disk cache"
+              ],
+              "a": 1,
+              "why": "Cron jobs fail quietly by default. A manual run under the same user and environment catches the problems while you are watching."
+            },
+            {
+              "q": "Which line stops the snapshots from filling the disk?",
+              "opts": [
+                "`mkdir -p \"$DEST/$STAMP\"`",
+                "The rsync call",
+                "The rotation line that keeps only the newest `$KEEP` folders",
+                "`set -euo pipefail`"
+              ],
+              "a": 2,
+              "why": "Without rotation every snapshot is kept forever. The `ls -1dt | tail | xargs rm` line keeps the newest seven and discards the rest."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

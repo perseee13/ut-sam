@@ -1,0 +1,151 @@
+﻿import { useEffect } from "react";
+import { Link } from "react-router-dom";
+import AppHeader from "../components/AppHeader.jsx";
+import SiteFooter from "../components/SiteFooter.jsx";
+/* React Bits components — vendored as source in src/bits (see README). */
+import SplitText from "../bits/SplitText/SplitText.jsx";
+import BlurText from "../bits/BlurText/BlurText.jsx";
+import DecryptedText from "../bits/DecryptedText/DecryptedText.jsx";
+import SpotlightCard from "../bits/SpotlightCard.jsx";
+import GlareHover from "../bits/GlareHover.jsx";
+import Magnet from "../bits/Magnet/Magnet.jsx";
+import ClickSpark from "../bits/ClickSpark/ClickSpark.jsx";
+import ShinyText from "../bits/ShinyText.jsx";
+
+export default function HomePage() {
+  useEffect(function () {
+    document.title = "ServerPath — Learn Linux Servers";
+  }, []);
+
+  return (
+    <>
+      <AppHeader />
+      <div className="home-spark-wrap">
+      <ClickSpark sparkColor="rgba(47, 107, 255, 0.9)" sparkCount={9} sparkSize={7} sparkRadius={15} duration={450}>
+      <main>
+        <section className="hero">
+          <div className="container hero-inner">
+            <div className="hero-copy">
+              <p className="kicker">
+                <DecryptedText
+                  text="Build / Deploy / Manage"
+                  animateOn="view"
+                  sequential
+                  speed={40}
+                  maxIterations={16}
+                  revealDirection="start"
+                  parentClassName="kicker-decrypt"
+                />
+              </p>
+              <h1>
+                <SplitText
+                  tag="span"
+                  text="Linux Servers"
+                  className="hero-line"
+                  splitType="chars"
+                  delay={45}
+                  duration={0.9}
+                  textAlign="left"
+                />
+                <br />
+                <span className="hero-line">
+                  for a{" "}
+                  <SplitText
+                    tag="span"
+                    text="Stronger Web"
+                    className="accent"
+                    splitType="chars"
+                    delay={45}
+                    duration={0.9}
+                    textAlign="left"
+                  />
+                </span>
+              </h1>
+              <p className="lede">
+                Power your projects, websites, and applications with reliable, secure, and
+                high-performance Linux servers. Simple to manage. Built for what's next.
+              </p>
+              <div className="hero-actions">
+                <Magnet wrapperClassName="hero-magnet" padding={70} magnetStrength={3}>
+                  <Link className="btn btn-primary" to="/">&gt;_ Get Started</Link>
+                </Magnet>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="section section-tight" id="features">
+          <div className="container">
+            <div className="feature-grid">
+              <SpotlightCard className="feature-card" theme="light" spotlightColor="rgba(47, 107, 255, 0.12)">
+                <span className="feature-icon green" aria-hidden="true">🛡</span>
+                <h3>Secure by Design</h3>
+                <p>Keep your data and applications safe with the power and stability of Linux.</p>
+              </SpotlightCard>
+              <SpotlightCard className="feature-card" theme="light" spotlightColor="rgba(47, 107, 255, 0.12)">
+                <span className="feature-icon violet" aria-hidden="true">⚡</span>
+                <h3>High Performance</h3>
+                <p>Handle more traffic and scale with confidence — no unnecessary overhead.</p>
+              </SpotlightCard>
+              <SpotlightCard className="feature-card" theme="light" spotlightColor="rgba(47, 107, 255, 0.12)">
+                <span className="feature-icon blue" aria-hidden="true">⚙</span>
+                <h3>Full Control</h3>
+                <p>Customize, configure, and manage your server exactly how you want.</p>
+              </SpotlightCard>
+              <SpotlightCard className="feature-card" theme="light" spotlightColor="rgba(47, 107, 255, 0.12)">
+                <span className="feature-icon orange" aria-hidden="true">☁</span>
+                <h3>Open Source</h3>
+                <p>A flexible and trusted platform backed by a global community.</p>
+              </SpotlightCard>
+            </div>
+          </div>
+        </section>
+
+        <section className="section" id="freedom">
+          <div className="container freedom-inner">
+            <div className="freedom-copy">
+              <p className="kicker">Why Linux Servers?</p>
+              <h2>
+                <SplitText tag="span" text="Freedom to Build" splitType="words" delay={75} duration={0.8} textAlign="left" />
+                <br />
+                <SplitText tag="span" text="Without Limits" splitType="words" delay={75} duration={0.8} textAlign="left" />
+              </h2>
+              <BlurText
+                className="section-sub"
+                text="From small personal projects to large-scale production environments, Linux servers give you the freedom, control, and reliability to build without limits."
+                delay={25}
+                animateBy="words"
+                direction="top"
+              />
+              <div className="hero-actions">
+                <Magnet wrapperClassName="hero-magnet" padding={70} magnetStrength={3}>
+                  <Link className="btn btn-primary" to="/">Start Learning Free</Link>
+                </Magnet>
+              </div>
+            </div>
+            <div className="freedom-term" aria-hidden="true">
+              <div className="term">
+                <div className="term-bar"><span className="dot red"></span><span className="dot yellow"></span><span className="dot green"></span><span className="term-title">user@server — bash</span></div>
+                <div className="term-body">
+                  <p><span className="tprompt">user@server</span>:~$ sudo apt update</p>
+                  <p><span className="tprompt">user@server</span>:~$ sudo apt upgrade</p>
+                  <p><span className="tprompt">user@server</span>:~$ systemctl status nginx</p>
+                  <p><span className="tok">✓ Your server is running smoothly!</span></p>
+                </div>
+              </div>
+              <p className="freedom-note">
+                <ShinyText text="Small commands." color="#3b5bdb" shineColor="#ffffff" speed={3} trigger="loop" pauseOnHover />
+                <br />
+                <ShinyText text="Big possibilities." color="#3b5bdb" shineColor="#ffffff" speed={3} delay={1.2} trigger="loop" pauseOnHover />
+              </p>
+            </div>
+          </div>
+        </section>
+      </main>
+      </ClickSpark>
+      </div>
+      <SiteFooter />
+    </>
+  );
+}
+

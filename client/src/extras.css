@@ -1,0 +1,353 @@
+/* =========================================================
+   React client additions on top of the ported ServerPath theme.
+   The ported styles.css keeps the exact class names used by the
+   legacy static site, so components can reuse it directly.
+   ========================================================= */
+
+/* react-router NavLink adds .active; style it like the legacy .is-active */
+.site-nav a.active { color: var(--green); background: rgba(74, 222, 128, .1); }
+
+/* async loading / error notes (API not reachable, etc.) */
+.app-loading {
+  max-width: 780px;
+  padding: 36px 0;
+  color: var(--faint);
+  font-family: var(--mono);
+  font-size: .9rem;
+}
+
+.app-error {
+  max-width: 780px;
+  border: 1px solid var(--red);
+  border-left-width: 4px;
+  background: rgba(248, 113, 113, .08);
+  border-radius: var(--radius-sm);
+  padding: 18px 20px;
+  margin: 30px 0;
+}
+.app-error h2 { color: var(--red); margin: 0 0 8px; font-size: 1.08rem; }
+.app-error p { color: var(--muted); margin: 0 0 8px; font-size: .95rem; }
+.app-error code { white-space: pre-wrap; }
+.app-error ul { margin: 6px 0 0; padding-left: 1.2em; color: var(--muted); font-size: .92rem; }
+
+
+
+/* nudge the toggle button to stay reachable on small screens */
+.sidebar-toggle { margin-left: auto; }
+
+/* ---------- auth (login / register) ---------- */
+.auth-page {
+  display: flex;
+  justify-content: center;
+  padding: 64px 22px 90px;
+}
+.auth-card {
+  width: min(460px, 100%);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
+  padding: 34px 32px 28px;
+}
+.auth-card h1 { margin: 2px 0 6px; }
+.auth-form { display: grid; gap: 14px; margin-top: 18px; }
+.auth-form label { display: grid; gap: 6px; font-weight: 600; font-size: .92rem; }
+.auth-form input {
+  font: inherit;
+  padding: 11px 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg-alt);
+  color: var(--text);
+  width: 100%;
+}
+.auth-form input:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
+.auth-submit { width: 100%; margin-top: 6px; }
+.auth-submit:disabled { opacity: .6; cursor: wait; }
+.auth-error {
+  background: rgba(220, 38, 38, .08);
+  border: 1px solid var(--red);
+  border-left-width: 4px;
+  border-radius: var(--radius-sm);
+  color: var(--red);
+  padding: 10px 14px;
+  font-size: .92rem;
+  margin: 14px 0 0;
+}
+.auth-switch { margin: 18px 0 0; color: var(--muted); font-size: .93rem; text-align: center; }
+.nav-user {
+  color: var(--text);
+  font-weight: 700;
+  font-size: .9rem;
+  padding: 8px 4px;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.nav-link-btn {
+  font: inherit;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 8px 10px;
+  border-radius: 8px;
+}
+.nav-link-btn:hover { color: var(--red); background: rgba(220, 38, 38, .08); }
+
+/* ---------- Squid Proxy standalone page ---------- */
+.squid-page { padding: 0 0 70px; }
+.squid-hero {
+  position: relative; overflow: hidden;
+  border-bottom: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(94, 234, 212, .07), rgba(94, 234, 212, 0) 65%);
+}
+.squid-hero-bg { position: absolute; inset: 0; pointer-events: none; }
+.squid-orb { position: absolute; border-radius: 50%; filter: blur(60px); opacity: .5; }
+.squid-orb-a { width: 280px; height: 280px; left: -80px; top: -120px; background: rgba(94, 234, 212, .35); }
+.squid-orb-b { width: 320px; height: 320px; right: -100px; top: -140px; background: rgba(167, 139, 250, .35); }
+.squid-grid {
+  position: absolute; inset: 0; opacity: .5;
+  background-image: linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+  background-size: 34px 34px;
+}
+.squid-hero-inner { position: relative; padding: 64px 22px 46px; }
+.squid-page .kicker {
+  display: inline-flex; align-items: center; gap: 8px;
+  color: var(--muted); font-size: .82rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .14em; margin: 0 0 10px; font-family: var(--mono);
+}
+.kicker-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); }
+.squid-page h1 { display: flex; align-items: center; gap: 14px; margin: 0 0 10px; font-size: clamp(2.2rem, 5vw, 3.4rem); }
+.squid-emoji {
+  display: inline-grid; place-items: center; width: 64px; height: 64px; border-radius: 20px; font-size: 2rem;
+  background: linear-gradient(135deg, rgba(94,234,212,.25), rgba(167,139,250,.25));
+  border: 1px solid rgba(255,255,255,.16);
+}
+.squid-page .section-sub { max-width: 720px; font-size: 1.05rem; }
+.squid-hero-meta { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 0; }
+.squid-hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+.squid-lessons { display: grid; gap: 28px; margin-top: 26px; }
+.squid-lessons .lesson { margin: 0; scroll-margin-top: 110px; }
+.squid-lesson { position: relative; overflow: hidden; }
+.squid-lesson::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+  background: linear-gradient(180deg, var(--accent), var(--violet)); opacity: .85;
+}
+.lesson-num {
+  display: inline-grid; place-items: center; min-width: 34px; height: 26px; padding: 0 8px;
+  border-radius: 8px; background: rgba(94, 234, 212, .14); border: 1px solid rgba(94, 234, 212, .35);
+  color: var(--accent); font-family: var(--mono); font-size: .78rem; font-weight: 700;
+}
+.lesson-check { color: var(--accent); margin-right: 8px; font-size: 1.1em; }
+.lesson-crumb {
+  color: var(--faint); font-family: var(--mono); font-size: .78rem;
+  text-transform: uppercase; letter-spacing: .07em; margin: 0 0 8px;
+}
+.lesson-summary { color: var(--muted); }
+.lesson-list { padding-left: 1.25em; color: var(--muted); }
+.lesson-list li { margin-bottom: 8px; }
+.squid-how { display: flex; align-items: stretch; gap: 10px; margin: 26px 0 8px; }
+.squid-how-card {
+  flex: 1; display: flex; gap: 12px; align-items: center;
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 14px 16px;
+}
+.squid-how-card > span { font-size: 1.6rem; }
+.squid-how-card strong { display: block; }
+.squid-how-card p { margin: 0; color: var(--muted); font-size: .86rem; }
+.squid-how-card.is-squid { border-color: rgba(94, 234, 212, .45); }
+.squid-how-arrow { align-self: center; color: var(--accent); font-weight: 800; font-size: 1.2rem; }
+
+/* ---------- footer: readable, glowing, on-brand ---------- */
+.site-footer { position: relative; overflow: hidden; }
+.footer-glow {
+  position: absolute; inset: auto -20% -70% -20%; height: 220px; pointer-events: none;
+  background: radial-gradient(560px 120px at 50% 0%, rgba(94, 234, 212, .14), transparent 70%);
+}
+.footer-inner { position: relative; }
+.footer-brand { display: flex; align-items: center; gap: 12px; }
+.footer-brand .brand-mark { width: 40px; height: 40px; font-size: 1.2rem; }
+.footer-title { margin: 0; font-weight: 800; color: var(--text); }
+.footer-title em { font-style: normal; color: var(--accent); }
+.footer-sub { margin: 0; color: var(--text); font-size: .88rem; opacity: .85; }
+.site-footer nav { display: flex; gap: 6px; }
+.site-footer nav a {
+  color: var(--text); font-weight: 600; font-size: .9rem; padding: 8px 14px; border-radius: 99px;
+  border: 1px solid transparent; text-decoration: none;
+}
+.footer-squid {
+  display: flex; align-items: center; gap: 12px; flex: 1 1 320px; max-width: 480px;
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 12px 14px;
+}
+.footer-squid > div { flex: 1; min-width: 0; }
+.footer-squid-icon { font-size: 1.7rem; }
+.footer-squid-title { margin: 0 0 6px; font-weight: 700; font-size: .86rem; color: var(--text); }
+.footer-squid-bar { height: 8px; border-radius: 999px; background: var(--panel-2); border: 1px solid var(--line); overflow: hidden; }
+.footer-squid-bar span { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--accent), var(--violet)); }
+.footer-squid-meta { margin: 6px 0 0; font-size: .78rem; color: var(--muted); font-family: var(--mono); }
+.footer-squid-cta { white-space: nowrap; }
+
+/* ---------- admin dashboard ---------- */
+.admin-page { padding: 34px 0 60px; }
+.admin-page .kicker { color: var(--muted); font-size: .85rem; text-transform: uppercase; letter-spacing: .06em; margin: 0 0 4px; }
+.admin-page h1 { font-size: 1.9rem; margin: 0 0 6px; }
+.admin-page .section-sub { color: var(--muted); margin: 0 0 22px; }
+.admin-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin-bottom: 22px; }
+.admin-stat { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; }
+.admin-stat b { display: block; font-size: 1.5rem; color: var(--green); }
+.admin-stat span { font-size: .82rem; color: var(--muted); }
+.admin-table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); }
+.admin-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+.admin-table th, .admin-table td { padding: 13px 16px; text-align: left; border-bottom: 1px solid var(--line); }
+.admin-table th { background: rgba(74, 222, 128, .08); font-weight: 700; }
+.admin-table tbody tr:last-child td { border-bottom: none; }
+.admin-table tbody tr.is-self td { background: rgba(255, 214, 77, .14); }
+.admin-table tbody tr:hover td { background: rgba(74, 222, 128, .05); }
+.admin-date { color: var(--muted); font-size: .82rem; white-space: nowrap; }
+.admin-actions { white-space: nowrap; }
+.admin-notice { background: rgba(74, 222, 128, .1); border: 1px solid var(--green); border-left-width: 4px; border-radius: var(--radius-sm); color: var(--green); padding: 10px 14px; font-size: .92rem; margin: 12px 0 0; }
+.admin-notice.error { background: rgba(220, 38, 38, .1); border-color: var(--red); color: var(--red); }
+.role-badge { display: inline-block; padding: 3px 9px; border-radius: 999px; font-size: .78rem; font-weight: 700; }
+.role-admin { background: rgba(255, 214, 77, .3); color: #b8860b; }
+.role-user { background: rgba(74, 222, 128, .2); color: var(--green); }
+.nav-role-badge { display: inline-block; background: rgba(255, 214, 77, .35); color: #b8860b; border-radius: 999px; padding: 2px 8px; font-size: .7rem; font-weight: 700; margin-left: 8px; vertical-align: middle; line-height: 1.4; }
+.admin-denied { border: 1px solid var(--line); border-radius: var(--radius); padding: 32px 28px; background: var(--panel); text-align: center; }
+.admin-denied h1 { margin: 0 0 6px; }
+.admin-denied p { color: var(--muted); margin: 0 0 18px; }
+.empty-note { color: var(--muted); }
+
+/* ---------- React Bits (components vendored in src/bits) ---------- */
+
+/* SplitText renders inline-block wrappers; keep hero/section lines flush
+   with no baseline gap so the two-line headings look like plain text. */
+.hero-copy h1 .split-parent,
+.freedom-copy .split-parent,
+.section-head .split-parent { vertical-align: bottom; }
+/* Gradient headline is plain text (no SplitText inside .accent), so background-clip:text stays crisp. */
+.hero-copy h1 .accent { display: inline-block; padding-bottom: .08em; }
+
+/* Magnet wrapper around hero buttons lines up with the sibling button. */
+.hero-actions .hero-magnet { align-self: center; }
+
+/* GlareHover wrapper around the secondary hero button. */
+.hero-actions .glare-hover { align-self: center; }
+.hero-actions .glare-hover:hover { cursor: pointer; }
+.hero-actions .glare-hover:focus-within { outline: 2px solid var(--green); outline-offset: 2px; border-radius: 99px; }
+
+/* DecryptedText inside the mono kicker. */
+.kicker .kicker-decrypt { display: inline-block; }
+
+/* SpotlightCard keeps the existing card surface while the pointer
+   spotlight paints on top of it (two-class selector wins on order). */
+.spotlight-card.feature-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 24px 22px;
+  box-shadow: 0 10px 26px rgba(31, 62, 135, .08);
+}
+.feature-card h3 { margin: 0 0 8px; }
+.feature-card p { margin: 0; color: var(--muted); font-size: .95rem; }
+.spotlight-card.module-card {
+  background: linear-gradient(180deg, var(--panel), #0e1622);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 22px;
+}
+.spotlight-card.module-card:hover { border-color: var(--line-strong); }
+
+/* ---------- Learn page: lesson header, meta chips, pager ---------- */
+
+.lesson-crumb { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.crumb-sep { color: var(--faint); }
+.crumb-module { display: inline-flex; align-items: center; gap: 6px; color: var(--text); font-weight: 600; }
+
+.lesson-head h1 { margin-bottom: 10px; }
+
+.lesson-meta { align-items: center; gap: 8px; }
+.meta-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--panel-2); border: 1px solid var(--line); border-radius: 999px;
+  padding: 4px 12px; font-size: .8rem; color: var(--muted); line-height: 1.4;
+}
+.meta-chip.done-state.is-done {
+  background: rgba(22, 163, 74, .1); border-color: rgba(22, 163, 74, .3); color: var(--green);
+}
+
+/* ---------- Learn page: complete button + pager ---------- */
+
+.complete-wrap { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.complete-btn { position: relative; }
+.complete-btn.is-done { background: var(--green-deep); border-color: var(--green); color: var(--green); box-shadow: none; }
+
+.burst { position: absolute; inset: 0; pointer-events: none; }
+.burst span {
+  position: absolute; top: 50%; left: 50%;
+  width: 9px; height: 9px; border-radius: 50%;
+  animation: burst-fly .7s ease-out forwards;
+}
+@keyframes burst-fly {
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  100% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(.4); opacity: 0; }
+}
+
+.lesson-pager { display: flex; flex-direction: column; gap: 10px; }
+.pager-row { display: flex; gap: 14px; }
+.pager-link { transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease; }
+.pager-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-soft); }
+.pager-link .pager-mod { display: block; margin-top: 4px; font-style: normal; font-size: .78rem; color: var(--faint); }
+.pager-hint { margin: 2px 0 0; font-size: .8rem; color: var(--faint); font-family: var(--mono); }
+.pager-link.next.is-pulse { border-color: var(--accent); animation: pulse-ring 1.8s ease-in-out 3; }
+@keyframes pulse-ring {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(47, 107, 255, .35); }
+  50% { box-shadow: 0 0 0 8px rgba(47, 107, 255, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .burst { display: none; }
+  .pager-link:hover { transform: none; }
+  .pager-link.next.is-pulse { animation: none; }
+}
+
+/* ---------- Learn page: sidebar module progress bars ---------- */
+
+.module-bar {
+  display: block; height: 5px; border-radius: 999px;
+  background: var(--panel-2); border: 1px solid var(--line);
+  margin: 0 0 8px; overflow: hidden;
+}
+.module-bar span {
+  display: block; height: 100%; border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), #6d9bff);
+  transition: width .25s ease;
+}
+
+@media (max-width: 720px) {
+  .pager-row { flex-direction: column; }
+  .pager-link { max-width: none; }
+}
+
+/* ---------- React Bits reduced motion (see section above) ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .shiny-text { background-image: none !important; -webkit-text-fill-color: unset; color: inherit; }
+  .home-spark-wrap canvas { display: none; }
+}
+
+/* ---------- Hero typing terminal ---------- */
+
+.hero-mini-term .term-body { min-height: 7.2em; }
+.term-cursor { margin-left: 2px; font-weight: 400; }
+.term-done { animation: term-fade-in .5s ease both; }
+@keyframes term-fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .term-done { animation: none; }
+  .blink { animation: none; }
+}
+
