@@ -80,6 +80,5 @@ async function run() {
   console.log("  " + failures + " failure(s)");
   console.log("");
 
-  process.exitCode = failures ? 1 : 0;
-  server.close();
+  process.exit(failures ? 1 : 0);
 }

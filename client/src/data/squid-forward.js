@@ -46,23 +46,59 @@ export const FORWARD_PROXY = {
       min: 5,
       sum: "Install the official Squid proxy package on Ubuntu/Debian and inspect default runtime ports.",
       blocks: [
-        { t: "p", x: "Begin by updating the local package repositories and installing the **squid** service binary from the standard distribution repository." },
-        { t: "h", x: "Package Installation Commands" },
+        { t: "p", x: "Begin by updating the local package repositories and installing the **squid** service binary, then verify the daemon and inspect its default configuration." },
+        { t: "h", x: "Step 1: Update and Installation" },
         {
           t: "code",
           lang: "bash",
-          title: "Install Squid on Debian / Ubuntu",
-          x: "sudo apt update && sudo apt install -y squid\n\n# Enable the service to start automatically on system boot\nsudo systemctl enable squid\nsudo systemctl start squid"
+          title: "Update and Install Squid",
+          x: "sudo apt update\nsudo apt install squid -y"
         },
-        { t: "h", x: "Verifying Daemon Status and Port Listening" },
-        { t: "p", x: "Ensure that Squid is actively running without syntax faults, and verify that the operating system kernel is actively listening on TCP port 3128." },
+        {
+          t: "img",
+          src: "/images/update.jpg",
+          caption: "Update package lists (sudo apt update).",
+          alt: "Terminal showing apt update output"
+        },
+        {
+          t: "img",
+          src: "/images/install.jpg",
+          caption: "Install Squid (sudo apt install squid -y).",
+          alt: "Terminal showing Squid installation"
+        },
+        { t: "h", x: "Step 2: Verify Installation and Service" },
         {
           t: "code",
           lang: "bash",
-          title: "Check Systemd Service & Sockets",
-          x: "# Check service status\nsudo systemctl status squid --no-pager\n\n# Confirm port 3128 is listening\nsudo ss -tulpn | grep 3128"
+          title: "Check Version & Manage Service",
+          x: "# checking the version of squid\nsquid -v\n\nsudo systemctl start squid\nsudo systemctl enable squid\nsudo systemctl status squid"
         },
-        { t: "tip", x: "By default, Squid listens on `0.0.0.0:3128`, but its default security policy rejects any client that is not `localhost`." }
+        {
+          t: "img",
+          src: "/images/enable.jpg",
+          caption: "Start and enable the Squid service.",
+          alt: "Terminal showing Squid service started/enabled"
+        },
+        {
+          t: "img",
+          src: "/images/status.jpg",
+          caption: "Verify Squid service status (systemctl status squid).",
+          alt: "Terminal showing Squid service status"
+        },
+        { t: "h", x: "Step 3: Check the Default Configuration" },
+        {
+          t: "code",
+          lang: "bash",
+          title: "Open Default squid.conf",
+          x: "sudo nano /etc/squid/squid.conf"
+        },
+        {
+          t: "img",
+          src: "/images/squidconf.jpg",
+          caption: "Check the default Squid configuration (/etc/squid/squid.conf).",
+          alt: "Terminal showing squid.conf in nano"
+        },
+        { t: "tip", x: "By default, Squid listens on `http_port 3128`, but its default security policy rejects any client that is not `localhost`. You’ll allow your LAN in the next step." }
       ]
     },
     {
@@ -94,6 +130,12 @@ export const FORWARD_PROXY = {
           title: "Parse & Reload Squid",
           x: "# Test for syntax errors\nsudo squid -k parse\n\n# If no fatal errors are reported, reload without dropping active connections\nsudo systemctl reload squid"
         },
+        {
+          t: "img",
+          src: "/images/parse.jpg",
+          caption: "Validate configuration syntax with squid -k parse, then reload Squid.",
+          alt: "Terminal showing squid -k parse and reload"
+        },
         { t: "warn", x: "Squid rules are evaluated sequentially from top to bottom. If you place `http_access deny all` above `http_access allow localnet`, all client requests will be rejected." }
       ]
     },
@@ -111,6 +153,12 @@ export const FORWARD_PROXY = {
           title: "Run from client terminal",
           x: "# Export proxy environment variables pointing to Squid server (192.168.1.10)\nexport http_proxy=http://192.168.1.10:3128\nexport https_proxy=http://192.168.1.10:3128\n\n# Make an HTTP request and inspect headers\ncurl -I http://example.com"
         },
+        {
+          t: "img",
+          src: "/images/curl.jpg",
+          caption: "Client test using curl through the Squid forward proxy.",
+          alt: "Terminal showing curl test through Squid proxy"
+        },
         { t: "h", x: "Method B: Inspecting Real-Time Access Logs on the Server" },
         { t: "p", x: "On the Squid server, watch `/var/log/squid/access.log`. Every client request generates a log entry showing the response status code, source IP, and whether it was a **TCP_MISS** or **TCP_HIT**:" },
         {
@@ -119,6 +167,15 @@ export const FORWARD_PROXY = {
           title: "Monitor Live Squid Traffic",
           x: "sudo tail -f /var/log/squid/access.log\n\n# Expected output:\n# 1718902800.123 192.168.1.50 TCP_MISS/200 1256 GET http://example.com/ - HIER_DIRECT/93.184.216.34 text/html\n# 1718902804.881 192.168.1.51 TCP_HIT/200 1264 GET http://example.com/ - HIER_NONE/- text/html"
         },
+        {
+          t: "img",
+          src: "/images/tail.jpg",
+          caption: "Live access log monitoring with tail — admins can track which sites users visit through the proxy (access.log).",
+          alt: "Terminal showing tail -f /var/log/squid/access.log output"
+        },
+        { t: "h", x: "Admin Monitoring: Tracking User Site Visits" },
+        { t: "p", x: "Squid records every proxied request in `/var/log/squid/access.log`, including the client IP, timestamp, HTTP method/status, and the destination site/URL. Administrators can use `tail -f` for real-time monitoring or review the log later for auditing and troubleshooting." },
+        { t: "warn", x: "Access logs may contain sensitive browsing activity. Restrict log file permissions, follow your organization’s privacy policy, and inform users when monitoring is in place." },
         { t: "h", x: "Firewall Configuration (ufw)" },
         {
           t: "code",

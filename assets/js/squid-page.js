@@ -38,7 +38,7 @@
         '<span class="code-lang">' + Site.esc(block.lang || "bash") + "</span>" +
         title +
         '<button type="button" class="code-copy" data-copy="' +
-        Site.esc(block.x).replace(/"/g, "&quot;") + '">copy</button>' +
+        Site.esc(block.x).replace(/\"/g, "&quot;") + '">copy</button>' +
         "</figcaption><pre><code>" + Site.esc(block.x) + "</code></pre></figure>";
     }
     if (block.t === "tip") {
@@ -48,6 +48,17 @@
     if (block.t === "warn") {
       return '<div class="callout callout-warn"><strong>Watch out</strong><p>' +
         Site.inline(block.x) + "</p></div>";
+    }
+    if (block.t === "fig") {
+      var imgSrc = block.img || "";
+      var caption = block.caption || "";
+      var badge = block.badge ? '<span class="fig-badge">' + Site.esc(block.badge) + "</span>" : "";
+      return '<figure class="lesson-figure">' +
+        '<div class="lesson-figure-frame">' +
+        '<img class="lesson-figure-img" src="' + Site.esc(imgSrc) + '" alt="' + Site.esc(caption) + '">' +
+        "</div>" +
+        (caption ? '<figcaption class="lesson-figcaption">' + badge + Site.inline(caption) + "</figcaption>" : "") +
+        "</figure>";
     }
     return "";
   }

@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef, useCallback } from "react";
-import { Link } from "react-router-dom";
 
 const POLL_INTERVAL_MS = 3000;
 
@@ -70,7 +69,7 @@ export default function DataPage() {
   }, [fetchLatest, fetchHistory]);
 
   const tStatus = reading ? statusFor(reading.turbidity, [1, 5], ["Clear", "Moderate", "High"]) : "—";
-  const fStatus = reading ? statusFor(reading.tof, [50, 300, 500], ["Excellent", "Good", "Fair", "Poor"]) : "—";
+  const dStatus = reading ? statusFor(reading.tds, [50, 300, 500], ["Excellent", "Good", "Fair", "Poor"]) : "—";
   const lStatus = reading ? statusFor(reading.light, [50, 300], ["Low Light", "Moderate", "Bright"]) : "—";
 
   return (
@@ -78,7 +77,6 @@ export default function DataPage() {
       <header className="dashboard-header">
         <h1>🌊 Sensor Monitor</h1>
         <p className="subtitle">Live readings from ESP32 water quality sensors</p>
-        <Link to="/" className="back-home">← Back to Home</Link>
       </header>
 
       {connected ? (
@@ -106,10 +104,10 @@ export default function DataPage() {
           <div className="card-status">{tStatus}</div>
           <div className="card-footer"><span className="card-updated">Updated {formatTimestamp(reading?.created_at)}</span></div>
         </article>
-        <article className="sensor-card card-tof">
-          <div className="card-header"><span className="card-icon" aria-hidden="true">📏</span><span className="card-label">TOF</span></div>
-          <div className="card-reading">{safeToFixed(reading?.tof, 2)}<span className="card-unit">ppm</span></div>
-          <div className="card-status">{fStatus}</div>
+        <article className="sensor-card card-tds">
+          <div className="card-header"><span className="card-icon" aria-hidden="true">🧂</span><span className="card-label">TDS</span></div>
+          <div className="card-reading">{safeToFixed(reading?.tds, 2)}<span className="card-unit">ppm</span></div>
+          <div className="card-status">{dStatus}</div>
           <div className="card-footer"><span className="card-updated">Updated {formatTimestamp(reading?.created_at)}</span></div>
         </article>
         <article className="sensor-card card-light">
@@ -128,7 +126,7 @@ export default function DataPage() {
           <div className="history-table-wrap">
             <table className="history-table">
               <thead>
-                <tr><th>Time</th><th>Turbidity (NTU)</th><th>TOF (ppm)</th><th>Light (lux)</th></tr>
+                <tr><th>Time</th><th>Turbidity (NTU)</th><th>TDS (ppm)</th><th>Light (lux)</th></tr>
               </thead>
               <tbody>
                 {history.slice().reverse().map(function (row, i) {
@@ -136,7 +134,7 @@ export default function DataPage() {
                     <tr key={i}>
                       <td className="mono">{formatTimestamp(row.created_at)}</td>
                       <td className="mono">{safeToFixed(row.turbidity, 2)}</td>
-                      <td className="mono">{safeToFixed(row.tof, 2)}</td>
+                      <td className="mono">{safeToFixed(row.tds, 2)}</td>
                       <td className="mono">{safeToFixed(row.light, 2)}</td>
                     </tr>
                   );

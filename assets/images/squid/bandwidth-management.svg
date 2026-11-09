@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="800" height="400">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f2140"/>
+      <stop offset="100%" stop-color="#1a2a44"/>
+    </linearGradient>
+    <linearGradient id="graph" x1="0" y1="0" x2="0" y2="1">
+
+  <!-- Left side: Without Squid -->
+  <g transform="translate(40, 80)">
+    <rect x="-200" y="-80" width="400" height="160" rx="12" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+    <text x="0" y="-52" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="600" fill="#93c5fd">Without Squid</text>
+    <text x="0" y="-38" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#64748b">every user downloads</text>
+    <text x="0" y="-24" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#64748b">the same file again!</text>
+
+    <g fill="#fca5a5" opacity="0.6">
+      <line x1="-120" y1="-10" x2="-60" y2="-10" stroke-width="2"/>
+      <polygon points="-55,-5 -70,0 -55,-15"/>
+      <text x="-120" y="-24" text-anchor="middle" font-size="9" fill="#fca5a5">👤</text>
+      <line x1="-80" y1="-10" x2="-60" y2="-10" stroke-width="2"/>
+      <polygon points="-75,-5 -90,0 -75,-15"/>
+      <text x="-80" y="-24" text-anchor="middle" font-size="9" fill="#fca5a5">👤</text>
+      <line x1="-40" y1="-10" x2="-60" y2="-10" stroke-width="2"/>
+      <polygon points="-35,-5 -50,0 -35,-15"/>
+      <text x="-40" y="-24" text-anchor="middle" font-size="9" fill="#fca5a5">👤</text>
+    </g>
+
+    <rect x="-20" y="-90" width="40" height="60" rx="8" fill="#334155" stroke="#475569" stroke-width="2"/>
+    <text x="0" y="-65" text-anchor="middle" font-size="10" fill="#94a3b8">📦</text>
+    <line x1="0" y1="-50" x2="0" y2="-10" stroke="#475569" stroke-width="3"/>
+    <text x="0" y="-4" text-anchor="middle" font-size="8" fill="#94a3b8">3× download (300 MB total)</text>
+  </g>
+
+  <path d="M200,0 L220,200" fill="none" stroke="#93c5fd" stroke-width="3" marker-end="url(#arrow1)"/>
+  <polygon points="216,195 230,200 216,205" fill="#93c5fd" stroke="none"/>
+
+  <!-- With Squid -->
+  <g transform="translate(560, 80)">
+    <rect x="-200" y="-80" width="400" height="160" rx="12" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+    <text x="0" y="-52" text-anchor="middle" font-size="14" font-weight="600" fill="#4ade80">With Squid Caching</text>
+    <text x="0" y="-38" text-anchor="middle" font-size="10" fill="#64748b">first download only</text>
+    <text x="0" y="-24" text-anchor="middle" font-size="10" fill="#64748b">the rest reuse it!</text>
+
+    <g fill="#93c5fd" opacity="0.6">
+      <line x1="-120" y1="-10" x2="-60" y2="-10" stroke-width="2"/>
+      <polygon points="-55,-5 -70,0 -55,-15"/>
+      <text x="-120" y="-24" text-anchor="middle" font-size="9" fill="#93c5fd">👤</text>
+    </g>
+
+    <rect x="-20" y="-90" width="40" height="60" rx="8" fill="#047857" stroke="#15803d" stroke-width="2"/>
+    <text x="0" y="-65" text-anchor="middle" font-size="10" fill="#4ade80">📦</text>
+    <line x1="0" y1="-50" x2="0" y2="-10" stroke="#15803d" stroke-width="3"/>
+    <text x="0" y="-4" text-anchor="middle" font-size="8" fill="#4ade80">1× download (100 MB total)</text>
+
+    <g fill="#4ade80" opacity="0.4">
+      <line x1="-70" y1="-30" x2="-80" y2="-70" stroke-width="2"/>
+      <polygon points="-74,-65 -76,-60 -76,-70"/>
+      <text x="-80" y="-46" text-anchor="middle" font-size="9" fill="#4ade80">👤</text>
+      <text x="-80" y="-20" text-anchor="middle" font-size="8" fill="#14532d">✓ HIT</text>
+      <line x1="-100" y1="-30" x2="-110" y2="-70" stroke-width="2"/>
+      <polygon points="-104,-65 -106,-60 -106,-70"/>
+      <text x="-110" y="-46" text-anchor="middle" font-size="9" fill="#4ade80">👤</text>
+      <text x="-110" y="-20" text-anchor="middle" font-size="8" fill="#14532d">✓ HIT</text>
+    </g>
+  </g>
+
+  <defs>
+    <marker id="arrow1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <polygon points="0 0, 10 5, 0 10" fill="#93c5fd"/>
+    </marker>
+  </defs>
+</svg>
+
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#0ea5e9"/>
+    </linearGradient>
+    <linearGradient id="graph2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#4ade80"/>
+      <stop offset="100%" stop-color="#22c55e"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="400" fill="url(#bg)" rx="16"/>
+  <circle cx="720" cy="70" r="50" fill="#1e3a5f" opacity="0.4"/>
+  <circle cx="30" cy="350" r="40" fill="#1e3a5f" opacity="0.4"/>
+  <text x="400" y="48" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#93c5fd" letter-spacing="1">How Bandwidth Management Works</text>
+</svg>

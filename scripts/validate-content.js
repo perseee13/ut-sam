@@ -42,7 +42,7 @@ DATA_FILES.forEach(loadScript);
 const modules = fakeWindow.COURSE_MODULES;
 const moduleIds = new Set();
 const lessonKeys = new Set();
-const blockTypes = new Set(["h", "p", "ul", "code", "tip", "warn"]);
+const blockTypes = new Set(["h", "p", "ul", "code", "tip", "warn", "fig"]);
 let lessonCount = 0;
 let minuteCount = 0;
 
@@ -76,6 +76,8 @@ modules.forEach(function (module) {
       check(blockTypes.has(block.t), label + " has a valid type (" + block.t + ")");
       if (block.t === "ul") {
         check(Array.isArray(block.x) && block.x.length > 0, label + " list is non-empty");
+      } else if (block.t === "fig") {
+        check(typeof block.img === "string" && block.img.length > 0, label + " has an image");
       } else {
         check(typeof block.x === "string" && block.x.length > 0, label + " has content");
       }

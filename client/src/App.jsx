@@ -3,7 +3,6 @@ import { useAuth } from "./lib/auth.jsx";
 import HomePage from "./pages/HomePage.jsx";
 import SquidProxyPage from "./pages/SquidProxyPage.jsx";
 import SquidTopicPage from "./pages/SquidTopicPage.jsx";
-import DataPage from "./pages/DataPage.jsx";
 import FileServerPage from "./pages/FileServerPage.jsx";
 import MailServerPage from "./pages/MailServerPage.jsx";
 import MQTTPage from "./pages/MQTTPage.jsx";
@@ -36,7 +35,6 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
-      <Route path="/data" element={<DataPage />} />
       <Route path="/squid-proxy" element={<SquidProxyPage />} />
       <Route path="/squid-proxy/forward-proxy" element={<SquidTopicPage topic={FORWARD_PROXY} />} />
       <Route path="/squid-proxy/reverse-proxy" element={<SquidTopicPage topic={REVERSE_PROXY} />} />

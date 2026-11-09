@@ -8,6 +8,7 @@ import { InlineText } from "../lib/inline.jsx";
 import { getModule } from "../api.js";
 import { useAsync } from "../lib/useAsync.js";
 import { progressStore, useProgress } from "../lib/progress.js";
+import Debian13SquidTutorial from "../components/Debian13SquidTutorial.jsx";
 
 const SQUID_SUITE = [
   {
@@ -214,11 +215,14 @@ cache_dir ufs /var/spool/squid 4096 16 256`;
             </div>
 
             <div className="squid-hero-actions">
-              <Link className="btn btn-primary" to="/squid-proxy/forward-proxy">
-                Start with Forward Proxy →
+              <a className="btn btn-primary" href="#debian-squid-tutorial">
+                Start Debian 13 Tutorial ↓
+              </a>
+              <Link className="btn btn-ghost" to="/squid-proxy/forward-proxy">
+                Forward Proxy Lab →
               </Link>
               <a className="btn btn-ghost" href="#squid-architecture">
-                Compare Architectures
+                Architecture Models
               </a>
             </div>
           </div>
@@ -251,6 +255,9 @@ cache_dir ufs /var/spool/squid 4096 16 256`;
               </div>
             </div>
           </div>
+
+          {/* Debian 13 (Trixie) Step-by-Step Installation & Configuration Tutorial */}
+          <Debian13SquidTutorial />
 
           {/* 4 Squid Proxy Modes Launch Grid */}
           <section className="section" id="squid-architecture">

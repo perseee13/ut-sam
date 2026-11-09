@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="800" height="400">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f2140"/>
+      <stop offset="100%" stop-color="#1a2a44"/>
+    </linearGradient>
+    <linearGradient id="cache1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4ade80"/>
+      <stop offset="100%" stop-color="#22c55e"/>
+    </linearGradient>
+    <linearGradient id="cache2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#0ea5e9"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="400" fill="url(#bg)" rx="16"/>
+
+  <!-- Decorative circles -->
+  <circle cx="680" cy="60" r="60" fill="#1e3a5f" opacity="0.4"/>
+  <circle cx="50" cy="360" r="40" fill="#1e3a5f" opacity="0.4"/>
+
+  <!-- Title -->
+  <text x="400" y="48" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#93c5fd" letter-spacing="1">How Caching Works</text>
+
+  <!-- Client device 1 (first visit - MISS) -->
+  <g transform="translate(100, 140)">
+    <rect x="-30" y="-40" width="60" height="80" rx="12" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+    <rect x="-20" y="-30" width="40" height="20" rx="6" fill="#0f172a"/>
+    <circle cx="0" cy="40" r="16" fill="#4ade80" opacity="0.8"/>
+    <text x="0" y="44" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#0f172a" font-weight="bold">📱</text>
+    <text x="0" y="62" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#64748b">Client 1</text>
+    <text x="0" y="74" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#64748b">downloads →</text>
+    <!-- MISS indication -->
+    <rect x="-40" y="-60" width="80" height="16" rx="8" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5" opacity="0.9"/>
+    <text x="0" y="-48" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" font-weight="600" fill="#92400e">✗ MISS</text>
+  </g>
+
+  <!-- Arrow 1 -->
+  <path d="M140,180 L200,180" fill="none" stroke="#93c5fd" stroke-width="3" marker-end="url(#arrowhead)"/>
+  <polygon points="196,174 210,180 196,186" fill="#93c5fd" stroke="none"/>
+
+  <!-- Squid Proxy server -->
+  <g transform="translate(260, 120)">
+    <rect x="-70" y="-50" width="140" height="100" rx="12" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+    <rect x="-60" y="-60" width="120" height="14" rx="6" fill="#1e293b"/>
+    <!-- Cache storage box -->
+    <rect x="-50" y="-35" width="100" height="50" rx="6" fill="url(#cache1)" stroke="#16a34a" stroke-width="2"/>
+    <text x="0" y="-16" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="600" fill="#064e3b">💾 Cache</text>
+    <!-- classification of content -->
+    <rect x="-40" y="-12" width="80" height="8" rx="4" fill="#16a34a" opacity="0.6"/>
+    <circle cx="0" cy="55" r="10" fill="#93c5fd"/>
+    <text x="0" y="62" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#1e293b" font-weight="bold">📦</text>
+    <text x="0" y="74" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#64748b">Stores files</text>
+  </g>
+
+  <!-- Arrow 2 -->
+  <path d="M330,170 L380,170" fill="none" stroke="#93c5fd" stroke-width="3" marker-end="url(#arrowhead2)"/>
+  <polygon points="376,164 390,170 376,176" fill="#93c5fd" stroke="none"/>
+
+  <!-- Client device 2 (second visit - HIT from cache) -->
+  <g transform="translate(440, 140)">
+    <rect x="-30" y="-40" width="60" height="80" rx="12" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+    <rect x="-20" y="-30" width="40" height="20" rx="6" fill="#0f172a"/>
+    <circle cx="0" cy="40" r="16" fill="#4ade80" opacity="0.8"/>
+    <text x="0" y="44" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#0f172a" font-weight="bold">📱</text>
+    <text x="0" y="62" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#64748b">Client 2</text>
+    <text x="0" y="74" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#64748b">uses cached →</text>
+    <!-- HIT indication -->
+    <rect x="-40" y="-60" width="80" height="16" rx="8" fill="#dcfce7" stroke="#22c55e" stroke-width="1.5" opacity="0.9"/>
+    <text x="0" y="-48" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" font-weight="600" fill="#14532d">✓ HIT</text>
+  </g>
+
+  <defs>
+    <marker id="arrowhead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <polygon points="0 0, 10 5, 0 10" fill="#93c5fd"/>
+    </marker>
+    <marker id="arrowhead2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <polygon points="0 0, 10 5, 0 10" fill="#22c55e"/>
+    </marker>
+  </defs>
+</svg>

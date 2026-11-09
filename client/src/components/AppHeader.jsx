@@ -38,8 +38,27 @@ export default function AppHeader() {
   const modulesRef = useRef(null);
   const squidRef = useRef(null);
   const userRef = useRef(null);
+  const modulesTimer = useRef(null);
+  const squidTimer = useRef(null);
 
   const doneCount = progress.size || 0;
+
+  function openModules() {
+    if (modulesTimer.current) clearTimeout(modulesTimer.current);
+    setModulesOpen(true);
+  }
+  function closeModules() {
+    if (modulesTimer.current) clearTimeout(modulesTimer.current);
+    modulesTimer.current = setTimeout(function () { setModulesOpen(false); }, 180);
+  }
+  function openSquid() {
+    if (squidTimer.current) clearTimeout(squidTimer.current);
+    setSquidOpen(true);
+  }
+  function closeSquid() {
+    if (squidTimer.current) clearTimeout(squidTimer.current);
+    squidTimer.current = setTimeout(function () { setSquidOpen(false); }, 180);
+  }
 
   useEffect(function () {
     function onScroll() {
@@ -140,8 +159,8 @@ export default function AppHeader() {
           <div
             ref={modulesRef}
             className={`nav-dropdown ${modulesOpen ? "is-open" : ""}`}
-            onMouseEnter={function () { setModulesOpen(true); }}
-            onMouseLeave={function () { setModulesOpen(false); }}
+            onMouseEnter={openModules}
+            onMouseLeave={closeModules}
           >
             <button
               type="button"
@@ -194,17 +213,12 @@ export default function AppHeader() {
             )}
           </div>
 
-          {/* Data Page */}
-          <NavLink to="/data" end onClick={closeAll} className={({ isActive }) => isActive ? "nav-link is-active" : "nav-link"}>
-            <span>Data</span>
-          </NavLink>
-
           {/* Dedicated Squid Proxy Quick Access */}
           <div
             ref={squidRef}
             className={`nav-dropdown ${squidOpen ? "is-open" : ""}`}
-            onMouseEnter={function () { setSquidOpen(true); }}
-            onMouseLeave={function () { setSquidOpen(false); }}
+            onMouseEnter={openSquid}
+            onMouseLeave={closeSquid}
           >
             <button
               type="button"
@@ -242,12 +256,6 @@ export default function AppHeader() {
               </div>
             )}
           </div>
-
-          {/* Quick Terminal Playground Link */}
-          <a href="#playground" className="nav-link nav-terminal-link" onClick={closeAll}>
-            <span className="term-pulse-dot"></span>
-            <span>Terminal</span>
-          </a>
 
           {/* Progress chip indicator if any done */}
           {doneCount > 0 ? (

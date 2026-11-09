@@ -1,9 +1,9 @@
 {
   "meta": {
-    "generatedAt": "2026-10-18T15:01:47.235Z",
+    "generatedAt": "2026-11-02T13:30:12.944Z",
     "moduleCount": 8,
     "lessonCount": 26,
-    "minutes": 262
+    "minutes": 265
   },
   "modules": [
     {
@@ -45,6 +45,30 @@
               "x": "# without proxy: every client fetches from the internet\n# laptop -> internet   (100 MB downloaded 30x = 3000 MB)\n#\n# with Squid: first client fills the cache, the rest reuse it\n# laptop  -> squid (3128) -> internet\n# laptop2 -> squid (HIT from cache, no download)\n#\n# point a client at Squid for a quick test:\nexport http_proxy=http://192.168.1.10:3128\nexport https_proxy=http://192.168.1.10:3128\ncurl -I http://example.com"
             },
             {
+              "t": "h",
+              "x": "What Squid does: 4 practical jobs"
+            },
+            {
+              "t": "fig",
+              "img": "assets/images/squid/caching.svg",
+              "caption": "1. Caching: First visit downloads from internet; repeat visits are served from Squid cache."
+            },
+            {
+              "t": "fig",
+              "img": "assets/images/squid/access-control.svg",
+              "caption": "2. Access Control: Checks every request against ACL rules to permit or block sites."
+            },
+            {
+              "t": "fig",
+              "img": "assets/images/squid/monitoring.svg",
+              "caption": "3. Monitoring: Logs every request to access.log for traffic auditing."
+            },
+            {
+              "t": "fig",
+              "img": "assets/images/squid/bandwidth-management.svg",
+              "caption": "4. Bandwidth Management: Slashes external network consumption by 50-70%."
+            },
+            {
               "t": "tip",
               "x": "Think of Squid as a shared notebook: the first student looks up the answer online and writes it down; the next 29 students just read the notebook. Same web, far less waiting."
             },
@@ -80,73 +104,118 @@
         },
         {
           "id": "install-configure",
-          "title": "Install and run Squid",
-          "min": 12,
-          "sum": "Install Squid on Ubuntu, open port 3128, point a client at it and prove caching works.",
+          "title": "Install and configure Squid on Debian 13 (Trixie)",
+          "min": 15,
+          "sum": "Step-by-step tutorial: set up Debian 13 (Trixie), install Squid via terminal commands, configure squid.conf, open port 3128, and verify proxy caching.",
           "blocks": [
             {
               "t": "p",
-              "x": "Squid is one package, one config file and one port: **3128**. Install it, start it, then tell one client to use it before you open it to the whole LAN."
+              "x": "Debian 13 (Trixie) provides a rock-solid, secure, and modern foundation for Squid Proxy with Linux kernel 6.x and Squid 6.x in the official repositories. Here is the complete step-by-step installation and configuration guide."
             },
             {
               "t": "h",
-              "x": "Install and check"
+              "x": "Step 1: Install and Prepare Debian 13 (Trixie)"
+            },
+            {
+              "t": "p",
+              "x": "Boot the Debian 13 Netinst installer. In the **Software Selection (tasksel)** dialog, uncheck desktop environments (no GUI needed for a server) and check **SSH server** and **standard system utilities**. Leaving the root password blank automatically installs `sudo` and gives your user full administrative privileges."
             },
             {
               "t": "code",
               "lang": "bash",
-              "x": "sudo apt update && sudo apt install -y squid\nsudo systemctl enable --now squid\nsudo systemctl status squid --no-pager\nss -tlnp | grep 3128"
+              "title": "Verify Debian 13 and Update Packages",
+              "x": "# Check Debian release\ncat /etc/os-release\n\n# Identify IP address and network interface\nip -c a\n\n# Update package lists and upgrade system\nsudo apt update && sudo apt upgrade -y\n\n# Install network and administration tools\nsudo apt install -y curl wget nano ufw dnsutils net-tools"
             },
             {
               "t": "h",
-              "x": "The two lines that matter in squid.conf"
+              "x": "Step 2: Install Squid Proxy via Terminal"
+            },
+            {
+              "t": "p",
+              "x": "Install the Squid package from Debian's official repository, enable the systemd service to start on boot, and verify listening sockets on port 3128."
             },
             {
               "t": "code",
               "lang": "bash",
-              "title": "/etc/squid/squid.conf (essentials)",
-              "x": "http_port 3128\nacl localnet src 192.168.0.0/16\nhttp_access allow localnet"
+              "title": "Install and Start Squid Daemon",
+              "x": "# Install Squid from repository\nsudo apt update && sudo apt install -y squid\n\n# Enable and start service\nsudo systemctl enable squid\nsudo systemctl start squid\n\n# Check service status\nsudo systemctl status squid --no-pager\n\n# Confirm port 3128 is listening\nsudo ss -tulpn | grep 3128"
             },
             {
               "t": "h",
-              "x": "Prove it from a client"
+              "x": "Step 3: Configure Squid Proxy (/etc/squid/squid.conf)"
+            },
+            {
+              "t": "p",
+              "x": "Backup the factory 8,000-line config with `sudo cp /etc/squid/squid.conf /etc/squid/squid.conf.original`. Then edit `/etc/squid/squid.conf` with a clean production configuration:"
             },
             {
               "t": "code",
               "lang": "bash",
-              "x": "export http_proxy=http://192.168.1.10:3128 https_proxy=http://192.168.1.10:3128\ncurl -I http://example.com"
+              "title": "/etc/squid/squid.conf (Debian 13 Production Config)",
+              "x": "# Proxy listening port\nhttp_port 3128\nvisible_hostname debian-squid.local\n\n# Define LAN access control lists (adjust to match your subnet)\nacl localnet src 192.168.1.0/24\nacl localnet src 10.0.0.0/8\nacl localhost src 127.0.0.1/32 ::1\n\n# Allowed safe ports\nacl Safe_ports port 80          # http\nacl Safe_ports port 443         # https\nacl Safe_ports port 21          # ftp\nacl Safe_ports port 1025-65535  # registered ports\nacl SSL_ports port 443\nacl CONNECT method CONNECT\n\n# Access rules: Top-to-bottom, first match wins\nhttp_access deny !Safe_ports\nhttp_access deny CONNECT !SSL_ports\nhttp_access allow localhost manager\nhttp_access deny manager\nhttp_access allow localnet\nhttp_access allow localhost\nhttp_access deny all\n\n# Cache storage: 4 GB disk cache, 256 MB RAM cache\ncache_mem 256 MB\nmaximum_object_size 64 MB\ncache_dir ufs /var/spool/squid 4096 16 256"
+            },
+            {
+              "t": "h",
+              "x": "Step 4: Validate Syntax, Reload & Configure UFW Firewall"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "title": "Validate, Reload & Firewall",
+              "x": "# Always check syntax before reloading\nsudo squid -k parse\n\n# Initialize cache directories & reload daemon\nsudo squid -z\nsudo systemctl reload squid\n\n# Open port 3128 for LAN clients in UFW firewall\nsudo ufw allow OpenSSH\nsudo ufw allow from 192.168.1.0/24 to any port 3128 proto tcp\nsudo ufw enable"
+            },
+            {
+              "t": "h",
+              "x": "Step 5: Testing Whether Squid Works Correctly"
+            },
+            {
+              "t": "code",
+              "lang": "bash",
+              "title": "Testing with curl and live log monitoring",
+              "x": "# Test from Debian server loopback:\ncurl -x http://127.0.0.1:3128 -I http://example.com\n\n# Test from LAN client (e.g. 192.168.1.50):\nexport http_proxy=http://192.168.1.10:3128\nexport https_proxy=http://192.168.1.10:3128\ncurl -I http://example.com\n\n# Monitor live access log for TCP_MISS and TCP_HIT:\nsudo tail -f /var/log/squid/access.log"
             },
             {
               "t": "tip",
-              "x": "`squid -k parse` before every reload, and `journalctl -u squid -n 50` when it misbehaves."
+              "x": "Always run `sudo squid -k parse` before reloading. It checks your configuration for syntax errors and typos without interrupting active proxy connections."
             },
             {
               "t": "warn",
-              "x": "Default Squid only allows localhost. Until you add your LAN to `localnet`, other devices get access-denied — that is the safe default, not a bug."
+              "x": "Default Squid only permits connections from localhost. You must define your LAN subnet in `acl localnet` and allow it with `http_access allow localnet` before `http_access deny all`."
             }
           ],
           "quiz": [
             {
-              "q": "Which port does Squid listen on by default?",
+              "q": "Which command validates the syntax of squid.conf on Debian 13 without restarting the service?",
+              "opts": [
+                "sudo systemctl restart squid",
+                "sudo squid -k parse",
+                "sudo apt check squid",
+                "sudo squid --reboot"
+              ],
+              "a": 1,
+              "why": "'squid -k parse' inspects your configuration for errors and reports syntax issues without stopping the daemon."
+            },
+            {
+              "q": "Which port does Squid listen on by default for HTTP proxy traffic?",
               "opts": [
                 "80",
                 "443",
                 "3128",
-                "22"
+                "8080"
               ],
               "a": 2,
-              "why": "3128 is the classic Squid forward-proxy port."
+              "why": "Port 3128 is the standard default port for Squid proxy connections."
             },
             {
-              "q": "Safe order after editing squid.conf?",
+              "q": "In /var/log/squid/access.log, what does TCP_HIT indicate?",
               "opts": [
-                "Reload squid, then check syntax",
-                "Run `squid -k parse` to validate, then reload",
-                "Reboot the server",
-                "Delete the config and reinstall"
+                "The connection timed out",
+                "Squid served the file from its local cache without fetching it from the internet",
+                "The client was blocked by firewall",
+                "The server ran out of disk space"
               ],
               "a": 1,
-              "why": "Validate first with `squid -k parse`, then reload."
+              "why": "TCP_HIT means the requested URL was already in cache and was served immediately from local storage."
             }
           ]
         },

@@ -6,7 +6,7 @@ export const MQTT = {
   icon: "📡",
   title: "MQTT Messaging with Mosquitto",
   sum: "Build a lightweight IoT messaging infrastructure with Eclipse Mosquitto. Configure topics, QoS levels, persistent sessions, authentication, and TLS encryption for production-grade publish/subscribe communication.",
-  meta: ["📚 5 sections", "⏱ 35 min step-by-step", "🔌 port 1883 / 8883 TLS"],
+  meta: ["📚 6 sections", "⏱ 45 min step-by-step", "🔌 port 1883 / 8883 TLS"],
   heroTerm: [
     { prompt: "admin", cmd: "sudo systemctl status mosquitto --no-pager" },
     { prompt: "device", cmd: "mosquitto_pub -h 192.168.1.10 -u pi -P password -t 'sensors/temp' -m '24.5'" },
@@ -165,6 +165,367 @@ export const MQTT = {
         { t: "h", x: "Subscribe to All Sensor Data" },
         { t: "code", lang: "bash", title: "Subscribe with wildcard", x: "mosquitto_sub -h 192.168.1.10 -u dashboard_user -P YourPassword -t 'sensors/#' -v" },
         { t: "tip", x: "Use QoS 1 for sensor readings so no sample is lost if the connection briefly drops. Keep the JSON schema consistent (sensor, value, unit, ts) across NTU, TDS, and Lux so your dashboard can parse every message the same way." }
+      ]
+    },
+    {
+      id: "esp32-sensor-node",
+      title: "Step 5: ESP32 Sensor Node (Arduino IDE)",
+      min: 8,
+      sum: "Full ESP32 firmware: connects to Wi-Fi, reads turbidity/BH1750 light/VL53L0X ToF sensors, and publishes JSON telemetry to the Mosquitto broker over MQTT.",
+      blocks: [
+        { t: "p", x: "Upload this sketch to an ESP32 using the Arduino IDE. It connects to Wi-Fi, reads a turbidity sensor, a **BH1750** light sensor, and a **VL53L0X** ToF distance sensor, then publishes a JSON payload to the MQTT broker. Update `WIFI_SSID`, `WIFI_PASSWORD`, and `MQTT_BROKER` for your network." },
+        { t: "warn", x: "This sketch stores Wi-Fi and MQTT settings in code for lab/testing. For production, avoid hardcoding credentials, use secure provisioning, and enable MQTT authentication/TLS (see Steps 2–3) when possible." },
+        {
+          t: "code",
+          lang: "cpp",
+          title: "ESP32 MQTT sensor node (Arduino IDE)",
+          x: `#include <Wire.h>
+#include <WiFi.h>
+#include <PubSubClient.h>
+#include <BH1750.h>
+#include <Adafruit_VL53L0X.h>
+
+// =====================================
+// WIFI CONFIGURATION
+// =====================================
+const char* WIFI_SSID = "sap3ns";
+const char* WIFI_PASSWORD = "1234567890";
+
+// =====================================
+// MQTT CONFIGURATION
+// =====================================
+const char* MQTT_BROKER = "10.230.41.43";
+const int MQTT_PORT = 1883;
+
+const char* MQTT_TOPIC =
+    "esp32/turbidity_tds_light_data";
+
+const char* MQTT_STATUS_TOPIC =
+    "esp32/turbidity_tds_light_status";
+
+const char* MQTT_CLIENT_ID =
+    "esp32-turbidity-tof-light";
+
+const char* MQTT_USER = "";
+const char* MQTT_PASS = "";
+
+const unsigned long PUBLISH_INTERVAL_MS = 5000;
+const unsigned long WIFI_RETRY_MS = 10000;
+const unsigned long MQTT_RETRY_MS = 5000;
+
+// =====================================
+// ESP32 PIN CONFIGURATION
+// =====================================
+
+// Turbidity sensor V1.1
+#define TURBIDITY_PIN 32
+
+// BH1750 I2C bus
+#define LIGHT_SDA 18
+#define LIGHT_SCL 19
+
+// ToF I2C bus
+#define TOF_SDA 21
+#define TOF_SCL 22
+
+// =====================================
+// SENSOR GLOBALS
+// =====================================
+TwoWire lightWire = TwoWire(1);
+BH1750 lightMeter;
+Adafruit_VL53L0X tof;
+
+bool lightReady = false;
+bool tofReady = false;
+
+// =====================================
+// NETWORK GLOBALS
+// =====================================
+WiFiClient wifiClient;
+PubSubClient mqttClient(wifiClient);
+
+unsigned long lastPublish = 0;
+unsigned long lastWifiTry = 0;
+unsigned long lastMqttTry = 0;
+
+// =====================================
+// WIFI CONNECTION
+// =====================================
+void connectWiFi() {
+  Serial.print("Connecting to Wi-Fi: ");
+  Serial.println(WIFI_SSID);
+
+  WiFi.mode(WIFI_STA);
+  WiFi.setAutoReconnect(true);
+  WiFi.persistent(false);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+
+  unsigned long start = millis();
+
+  while (WiFi.status() != WL_CONNECTED &&
+         millis() - start < 15000) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println();
+
+  if (WiFi.status() == WL_CONNECTED) {
+    Serial.print("Wi-Fi connected. IP: ");
+    Serial.println(WiFi.localIP());
+  } else {
+    Serial.println("Wi-Fi not connected yet.");
+  }
+}
+
+void maintainWiFi() {
+  if (WiFi.status() == WL_CONNECTED) {
+    return;
+  }
+
+  unsigned long now = millis();
+
+  if (now - lastWifiTry >= WIFI_RETRY_MS) {
+    lastWifiTry = now;
+
+    Serial.println("Wi-Fi lost. Reconnecting...");
+    WiFi.disconnect();
+    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  }
+}
+
+// =====================================
+// MQTT CONNECTION
+// =====================================
+bool connectMQTT() {
+  Serial.print("Connecting to MQTT broker ");
+  Serial.print(MQTT_BROKER);
+  Serial.print("... ");
+
+  bool ok;
+
+  if (strlen(MQTT_USER) > 0) {
+    ok = mqttClient.connect(
+      MQTT_CLIENT_ID,
+      MQTT_USER,
+      MQTT_PASS,
+      MQTT_STATUS_TOPIC,
+      1,
+      true,
+      "offline"
+    );
+  } else {
+    ok = mqttClient.connect(
+      MQTT_CLIENT_ID,
+      nullptr,
+      nullptr,
+      MQTT_STATUS_TOPIC,
+      1,
+      true,
+      "offline"
+    );
+  }
+
+  if (ok) {
+    Serial.println("connected.");
+    mqttClient.publish(
+      MQTT_STATUS_TOPIC, "online", true
+    );
+  } else {
+    Serial.print("Connection failed, rc=");
+    Serial.println(mqttClient.state());
+  }
+
+  return ok;
+}
+
+void maintainMQTT() {
+  if (WiFi.status() != WL_CONNECTED) {
+    return;
+  }
+
+  if (mqttClient.connected()) {
+    return;
+  }
+
+  unsigned long now = millis();
+
+  if (now - lastMqttTry >= MQTT_RETRY_MS) {
+    lastMqttTry = now;
+    connectMQTT();
+  }
+}
+
+// =====================================
+// READ SENSORS AND PUBLISH MQTT
+// =====================================
+void publishSensorData() {
+
+  // -------------------------------------
+  // 1. TURBIDITY SENSOR
+  // -------------------------------------
+  int turbidityRaw = analogRead(TURBIDITY_PIN);
+
+  float turbidityVoltage =
+      turbidityRaw * 3.3 / 4095.0;
+
+  // -------------------------------------
+  // 2. BH1750 LIGHT SENSOR
+  // -------------------------------------
+  char luxStr[16] = "null";
+
+  if (lightReady) {
+    float lux = lightMeter.readLightLevel();
+
+    if (lux >= 0) {
+      snprintf(luxStr, sizeof(luxStr), "%.2f", lux);
+    }
+  }
+
+  // -------------------------------------
+  // 3. TOF DISTANCE SENSOR
+  // -------------------------------------
+  int tofDistanceMM = -1;
+  float tofDistanceCM = -1.0;
+
+  if (tofReady) {
+    VL53L0X_RangingMeasurementData_t measurement;
+
+    tof.rangingTest(&measurement, false);
+
+    if (measurement.RangeStatus != 4) {
+      tofDistanceMM = measurement.RangeMilliMeter;
+      tofDistanceCM = tofDistanceMM / 10.0;
+
+      Serial.print("ToF Distance: ");
+      Serial.print(tofDistanceMM);
+      Serial.print(" mm | ");
+      Serial.print(tofDistanceCM, 1);
+      Serial.println(" cm");
+    } else {
+      Serial.println("ToF: Out of range");
+    }
+  } else {
+    Serial.println("ToF: Sensor unavailable");
+  }
+
+  // -------------------------------------
+  // 4. BUILD JSON PAYLOAD
+  // -------------------------------------
+  char payload[400];
+
+  snprintf(
+    payload,
+    sizeof(payload),
+    "{\\"turbidity_raw\\":%d,"
+    "\\"turbidity_voltage\\":%.3f,"
+    "\\"lux\\":%s,"
+    "\\"tof_distance_mm\\":%d,"
+    "\\"tof_distance_cm\\":%.1f,"
+    "\\"rssi\\":%d}",
+    turbidityRaw,
+    turbidityVoltage,
+    luxStr,
+    tofDistanceMM,
+    tofDistanceCM,
+    WiFi.RSSI()
+  );
+
+  // -------------------------------------
+  // 5. PUBLISH TO MQTT
+  // -------------------------------------
+  Serial.print("Publishing to ");
+  Serial.println(MQTT_TOPIC);
+
+  Serial.println(payload);
+
+  if (mqttClient.publish(MQTT_TOPIC, payload)) {
+    Serial.println("MQTT publish successful.");
+  } else {
+    Serial.println("MQTT publish failed.");
+  }
+}
+
+// =====================================
+// SETUP
+// =====================================
+void setup() {
+  Serial.begin(115200);
+  delay(1000);
+
+  analogReadResolution(12);
+  analogSetPinAttenuation(TURBIDITY_PIN, ADC_11db);
+
+  Serial.println();
+  Serial.println("==================================");
+  Serial.println(" ESP32 SENSOR NODE - MQTT");
+  Serial.println(" Turbidity | ToF | BH1750");
+  Serial.println("==================================");
+
+  // -------------------------------------
+  // INITIALIZE BH1750
+  // -------------------------------------
+  lightWire.begin(LIGHT_SDA, LIGHT_SCL, 100000);
+
+  if (lightMeter.begin(
+        BH1750::CONTINUOUS_HIGH_RES_MODE,
+        0x23,
+        &lightWire)) {
+    lightReady = true;
+    Serial.println("BH1750: Connected");
+  } else {
+    Serial.println("BH1750: Not detected");
+  }
+
+  // -------------------------------------
+  // INITIALIZE TOF
+  // -------------------------------------
+  Wire.begin(TOF_SDA, TOF_SCL, 100000);
+
+  if (tof.begin(0x29, false, &Wire)) {
+    tofReady = true;
+    Serial.println("ToF VL53L0X: Connected");
+  } else {
+    Serial.println("ToF: Not detected");
+    Serial.println("Check SDA, SCL, VCC, and GND.");
+  }
+
+  Serial.println("Turbidity sensor: Ready");
+
+  // -------------------------------------
+  // WIFI AND MQTT
+  // -------------------------------------
+  connectWiFi();
+
+  mqttClient.setServer(MQTT_BROKER, MQTT_PORT);
+  mqttClient.setBufferSize(512);
+  mqttClient.setKeepAlive(30);
+
+  Serial.println("Starting sensor monitoring...");
+}
+
+// =====================================
+// MAIN LOOP
+// =====================================
+void loop() {
+  maintainWiFi();
+  maintainMQTT();
+
+  mqttClient.loop();
+
+  unsigned long now = millis();
+
+  if (now - lastPublish >= PUBLISH_INTERVAL_MS) {
+    lastPublish = now;
+
+    if (mqttClient.connected()) {
+      publishSensorData();
+    } else {
+      Serial.println("MQTT offline, skipping publish.");
+    }
+  }
+}`
+        }
       ]
     }
   ]

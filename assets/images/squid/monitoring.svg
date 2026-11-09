@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="800" height="400">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f2140"/>
+      <stop offset="100%" stop-color="#1a2a44"/>
+    </linearGradient>
+    <linearGradient id="monitor" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+    <linearGradient id="lineChart" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#0ea5e9"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="400" fill="url(#bg)" rx="16"/>
+
+  <!-- Decorative circles -->
+  <circle cx="720" cy="70" r="50" fill="#1e3a5f" opacity="0.4"/>
+  <circle cx="30" cy="350" r="40" fill="#1e3a5f" opacity="0.4"/>
+
+  <!-- Title -->
+  <text x="400" y="48" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#93c5fd" letter-spacing="1">How Monitoring Works</text>
+
+  <!-- Configuration file highlighted -->
+  <g transform="translate(70, 80)">
+    <rect x="-280" y="-160" width="560" height="320" rx="12" fill="#0f172a" stroke="#334155" stroke-width="2"/>
+    <rect x="-270" y="-150" width="540" height="14" rx="6" fill="#0f172a"/>
+    <!-- File lines -->
+    <rect x="-260" y="-120" width="520" height="18" rx="4" fill="#1e293b"/>
+    <rect x="-260" y="-80" width="520" height="18" rx="4" fill="#1e293b"/>
+    <rect x="-260" y="-40" width="520" height="18" rx="4" fill="#1e293b"/>
+    <rect x="-260" y="0" width="520" height="18" rx="4" fill="#1e293b"/>
+    <rect x="-260" y="40" width="520" height="18" rx="4" fill="#1e293b"/>
+    <rect x="-260" y="80" width="520" height="18" rx="4" fill="#1e293b"/>
+    <rect x="-260" y="120" width="520" height="18" rx="4" fill="#1e293b"/>
+    <!-- Cursor line -->
+    <rect x="80" y="-150" width="3" height="330" fill="#4ade80" opacity="0.7"/>
+
+    <!-- Status icons -->
+    <circle cx="-170" cy="130" r="6" fill="#22c55e"/>
+    <circle cx="-170" cy="130" r="3" fill="#064e3b"/>
+    <text x="-155" y="135" font-family="Arial, sans-serif" font-size="10" fill="#64748b">MISS</text>
+
+    <circle cx="-170" cy="90" r="6" fill="#22c55e"/>
+    <circle cx="-170" cy="90" r="3" fill="#064e3b"/>
+    <text x="-155" y="95" font-family="Arial, sans-serif" font-size="10" fill="#64748b">HIT</text>
+
+    <circle cx="-170" cy="50" r="6" fill="#22c55e"/>
+    <circle cx="-170" cy="50" r="3" fill="#064e3b"/>
+    <text x="-155" y="55" font-family="Arial, sans-serif" font-size="10" fill="#64748b">HIT</text>
+
+    <circle cx="-170" cy="10" r="6" fill="#22c55e"/>
+    <circle cx="-170" cy="10" r="3" fill="#064e3b"/>
+    <text x="-155" y="15" font-family="Arial, sans-serif" font-size="10" fill="#64748b">HIT</text>
+  </g>
+
+  <!-- Arrow -->
+  <path d="M330,240 L400,240" fill="none" stroke="#93c5fd" stroke-width="3" marker-end="url(#arrow1)"/>
+  <polygon points="396,234 410,240 396,246" fill="#93c5fd" stroke="none"/>
+
+  <!-- Monitor/Dashboard -->
+  <g transform="translate(450, 120)">
+    <!-- Monitor body -->
+    <rect x="-80" y="-60" width="160" height="160" rx="12" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+    <rect x="-72" y="-52" width="144" height="12" rx="5" fill="#0f172a"/>
+
+    <!-- Eye/Viewer -->
+    <circle cx="0" cy="0" r="35" fill="#fbbf24" opacity="0.3"/>
+    <circle cx="0" cy="0" r="25" fill="#f59e0b" opacity="0.5"/>
+    <circle cx="-12" cy="-8" r="5" fill="#fff"/>
+    <circle cx="12" cy="-8" r="5" fill="#fff"/>
+    <path d="M0,-8 L0,-20" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+    <path d="M-8,0 L-20,0" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+    <text x="0" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="600" fill="#fbbf24">👁️</text>
+    <text x="0" y="68" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#fbbf24">logs</text>
+    <text x="0" y="80" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#93c5fd">requests</text>
+  </g>
+
+  <!-- Access Log File -->
+  <g transform="translate(50, 320)">
+    <rect x="-100" y="-60" width="200" height="100" rx="8" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+    <rect x="-90" y="-50" width="180" height="10" rx="5" fill="#0f172a"/>
+
+    <!-- Log entries -->
+    <rect x="-80" y="-35" width="160" height="14" rx="4" fill="#334155" opacity="0.5"/>
+    <rect x="-80" y="-20" width="160" height="14" rx="4" fill="#22c55e" opacity="0.7"/>
+    <text x="-70" y="-15" text-anchor="start" font-family="Courier New, monospace" font-size="8" fill="#166534" font-weight="bold">192.168.1.1 → example.com</text>
+
+    <rect x="-80" y="-2" width="160" height="14" rx="4" fill="#22c55e" opacity="0.7"/>
+    <text x="-70" y="3" text-anchor="start" font-family="Courier New, monospace" font-size="8" fill="#166534" font-weight="bold">192.168.1.2 → github.com</text>
+
+    <rect x="-80" y="16" width="160" height="14" rx="4" fill="#22c55e" opacity="0.7"/>
+    <text x="-70" y="21" text-anchor="start" font-family="Courier New, monospace" font-size="8" fill="#166534" font-weight="bold">192.168.1.1 → wikipedia.org</text>
+
+    <rect x="-80" y="34" width="160" height="14" rx="4" fill="#fef3c7" opacity="0.6"/>
+    <text x="-70" y="39" text-anchor="start" font-family="Courier New, monospace" font-size="8" fill="#92400e">192.168.1.3 → games.example</text>
+
+    <rect x="-80" y="52" width="160" height="14" rx="4" fill="#22c55e" opacity="0.7"/>
+    <text x="-70" y="57" text-anchor="start" font-family="Courier New, monospace" font-size="8" fill="#166534" font-weight="bold">192.168.1.1 → linux.org</text>
+  </g>
+
+  <defs>
+    <marker id="arrow1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <polygon points="0 0, 10 5, 0 10" fill="#93c5fd"/>
+    </marker>
+  </defs>
+</svg>

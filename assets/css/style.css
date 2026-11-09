@@ -501,6 +501,23 @@ code {
   border: 1px solid var(--line-strong); color: var(--muted);
   background: var(--panel-2);
 }
+.topic-chip.sep {
+  font-size: .78rem; padding: 0 6px; border: none; background: transparent;
+  margin: 0 10px; color: var(--muted); line-height: 1;
+}
+
+/* MQTT broker page header */
+.topic-header { margin-bottom: 26px; }
+.topic-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; flex-wrap: wrap; }
+.topic-head-main { flex: 1; min-width: 220px; }
+.topic-head-side { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.topic-mini-nav { display: flex; align-items: center; gap: 8px; }
+.topic-mini-nav-link { font-size: .85rem; color: var(--muted); text-decoration: none; border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 4px 10px; }
+.topic-mini-nav-link:hover { border-color: var(--cyan); color: var(--cyan); }
+.topic-mini-nav-link:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+.hero-term { margin-bottom: 10px; }
+.hero-term-ok { color: var(--green); font-family: var(--mono); font-size: .85rem; margin: 0 0 2px 0; }
+.hero-term-prompt { color: var(--muted); font-family: var(--mono); font-size: .85rem; margin: 0 0 2px 0; }
 .topic-chip.is-done { background: rgba(74, 222, 128, .14); border-color: var(--green); color: var(--green); }
 .topic-actions { display: flex; gap: 12px; margin-bottom: 30px; }
 .topic-progress { margin-top: 20px; }
@@ -544,6 +561,208 @@ code {
 .callout-tip { background: rgba(74, 222, 128, .1); border-color: var(--green); color: var(--text); }
 .callout-warn { background: rgba(248, 113, 113, .1); border-color: var(--red); color: var(--text); }
 .callout strong { color: var(--text); }
+
+  /* ---------- illustration figures ---------- */
+  .lesson-figure {
+    margin: 28px 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .lesson-figure-frame {
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px;
+    overflow: hidden;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, .28);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: border-color var(--transition), box-shadow var(--transition);
+  }
+
+  .lesson-figure-frame:hover {
+    border-color: var(--cyan);
+    box-shadow: 0 20px 48px rgba(0, 0, 0, .40), 0 0 24px rgba(56, 189, 248, .12);
+  }
+
+  .lesson-figure-img {
+    width: 100%;
+    max-width: 640px;
+    height: auto;
+    border-radius: 10px;
+    display: block;
+  }
+
+  .lesson-figcaption {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+    padding: 0 4px;
+    font-size: 0.86rem;
+    color: var(--muted);
+    line-height: 1.5;
+    width: 100%;
+  }
+
+  .fig-badge {
+    font-family: var(--mono);
+    font-size: 0.66rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    padding: 3px 10px;
+    border-radius: 99px;
+    background: var(--cyan);
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  /* ---------- new section: Ano ang mga ginagawa nito? ---------- */
+  .anonang-mga-ginagawa {
+    margin: 44px 0 32px;
+    padding: 36px 40px;
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, .28);
+  }
+
+  .anonang-mga-ginagawa .section-label {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    background: rgba(56, 189, 248, .1);
+    padding: 5px 14px;
+    border-radius: 99px;
+    margin-bottom: 14px;
+  }
+
+  .anonang-mga-ginagawa h1 {
+    font-size: clamp(1.8rem, 3.5vw, 2.4rem);
+    margin: 0 0 10px;
+  }
+
+  .anonang-mga-ginagawa .intro {
+    font-size: 1.05rem;
+    line-height: 1.75;
+    color: var(--muted);
+    margin: 0 0 28px;
+    max-width: 680px;
+  }
+
+  .anonang-mga-ginagawa .function-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    margin: 28px 0;
+  }
+
+  .anonang-mga-ginagawa .function-card {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    padding: 24px;
+    background: var(--panel);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius);
+    transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
+  }
+
+  .anonang-mga-ginagawa .function-card:hover {
+    border-color: rgba(56, 189, 248, .35);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 48px rgba(0, 0, 0, .42);
+  }
+
+  .anonang-mga-ginagawa .function-icon {
+    flex: 0 0 80px;
+    height: 80px;
+    border-radius: 16px;
+    display: grid;
+    place-items: center;
+    font-size: 2rem;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, .35);
+  }
+
+  .anonang-mga-ginagawa .function-card h3 {
+    font-size: 1.2rem;
+    margin: 0 0 8px;
+    color: var(--text);
+  }
+
+  .anonang-mga-ginagawa .function-card p {
+    margin: 0;
+    color: var(--muted);
+    font-size: .94rem;
+    line-height: 1.65;
+  }
+
+  @media (max-width: 900px) {
+    .anonang-mga-ginagawa .function-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .squid-qa {
+    margin: 48px 0 0;
+    padding: 28px 36px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+
+  .squid-qa h2 {
+    font-size: 1.4rem;
+    margin: 0 0 16px;
+    color: var(--text);
+  }
+
+  .squid-qa .qa-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .squid-qa .qa-card {
+    padding: 20px;
+    background: var(--bg-alt);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    transition: border-color var(--transition);
+  }
+
+  .squid-qa .qa-card:hover {
+    border-color: var(--cyan);
+  }
+
+  .squid-qa .qa-card h4 {
+    font-size: 1rem;
+    margin: 0 0 6px;
+    color: var(--cyan);
+  }
+
+  .squid-qa .qa-card p {
+    margin: 0;
+    font-size: .9rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  @media (max-width: 900px) {
+    .squid-qa .qa-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
 
 .codeblock {
   background: var(--panel-2); border: 1px solid var(--line);
