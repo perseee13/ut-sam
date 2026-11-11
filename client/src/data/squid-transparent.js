@@ -30,6 +30,12 @@ export const TRANSPARENT_PROXY = {
           title: "Backup Squid config",
           x: "sudo cp /etc/squid/squid.conf /etc/squid/squid.conf.reverse.bak"
         },
+        {
+          t: "img",
+          src: "/images/transparentconf.jpg",
+          caption: "Backup the reverse proxy Squid configuration before switching to transparent mode.",
+          alt: "Transparent proxy config backup in terminal"
+        },
 
         { t: "h", x: "Step 2: Create a clean Transparent Proxy configuration" },
         {
@@ -97,7 +103,22 @@ export const TRANSPARENT_PROXY = {
           title: "Monitor access log",
           x: "sudo tail -f /var/log/squid/access.log"
         },
-        { t: "tip", x: "In the access log, look for requests to `http://www.ubuntu.com` (and often `ORIGINAL_DST` details depending on your setup) to confirm transparent interception is working." }
+        {
+          t: "img",
+          src: "/images/transparentweb.jpg",
+          caption: "Squid access log showing transparent proxy interception result.",
+          alt: "Transparent proxy result in Squid access log"
+        },
+        { t: "tip", x: "In the access log, look for requests to `http://www.ubuntu.com` (and often `ORIGINAL_DST` details depending on your setup) to confirm transparent interception is working." },
+
+        { t: "h", x: "Website I Visited" },
+        { t: "p", x: "this is website i visit" },
+        {
+          t: "img",
+          src: "/images/transparentwebsite.jpg",
+          caption: "this is website i visit",
+          alt: "Website visited through transparent proxy"
+        }
       ]
     }
   ]

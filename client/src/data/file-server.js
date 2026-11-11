@@ -6,11 +6,11 @@ export const FILE_SERVER = {
   icon: "📂",
   title: "Linux File Server",
   sum: "Build a production-ready file server on Linux: share folders over the LAN with Samba for Windows/macOS clients and NFS for Linux-to-Linux high-speed transfers. Configure user authentication, permissions, and firewall rules.",
-  meta: ["📚 4 sections", "⏱ 38 min step-by-step", "🔌 ports 445 / 2049 / 137-139"],
+  meta: ["📚 5 sections", "⏱ 38 min step-by-step", "🔌 ports 445 / 2049 / 137-139"],
   heroTerm: [
-    { prompt: "admin", cmd: "sudo systemctl status smbd nmbd --no-pager" },
-    { prompt: "windows", cmd: "net use Z: \\\\\\192.168.1.10\\shared /user:office" },
-    { ok: "✓ Samba share mounted as Z: — all team files accessible" }
+    { prompt: "admin", cmd: "sudo systemctl status smbd --no-pager" },
+    { prompt: "windows", cmd: "net use Z: \\\\192.168.1.10\\Fileshare /user:fileserveruser" },
+    { ok: "✓ Samba share mounted as Z: — files accessible" }
   ],
   progressPrefix: "fileserver",
   lessons: [
@@ -32,7 +32,7 @@ export const FILE_SERVER = {
           x: [
             "**Samba (SMB/CIFS, port 445)**: The Windows file sharing protocol. Windows, macOS, Linux, and iOS all support it natively. Uses username/password authentication. Best for: office environments, home networks with mixed OS devices, public or team shares.",
             "**NFS (port 2049)**: The native Unix/Linux file sharing protocol. No encryption or authentication by default — trust is IP-address-based. Typically 2–5× faster than Samba for Linux-to-Linux transfers. Best for: Linux servers, Docker volumes, high-speed bulk data, CI/CD build agents.",
-            "**Run Both Together**: A single server can export the same `/srv/shared` directory over both Samba and NFS simultaneously — Windows users connect via SMB, Linux servers mount via NFS.",
+            "**Run Both Together**: A single server can export the same directory over both Samba and NFS simultaneously — Windows users connect via SMB, Linux servers mount via NFS.",
             "**Port Requirements**: Samba needs TCP 445 (SMB), UDP 137-138 (NetBIOS name), TCP 139. NFS needs TCP/UDP 2049 plus several portmapper ports (111, 20048)."
           ]
         },
@@ -41,111 +41,74 @@ export const FILE_SERVER = {
       ]
     },
     {
-      id: "samba-install-share",
-      title: "Step 1: Install Samba and Create a Shared Folder",
-      min: 10,
-      sum: "Install Samba, create a directory with correct Linux permissions, define the share in smb.conf, and add a Samba user account.",
+      id: "samba-install",
+      title: "Step 1: Update the system and install Samba",
+      min: 6,
+      sum: "Update Debian 13, install Samba and client tools, and verify the installation.",
       blocks: [
-        { t: "p", x: "Samba requires three things: the **package** installed, the **folder** created with correct permissions, and the **smb.conf** configuration file describing what to share and who can access it." },
-        { t: "h", x: "Install Samba and Prepare the Share Directory" },
+        { t: "p", x: "First, make sure your Debian 13 is up to date, then install Samba and the necessary client tools." },
         {
           t: "code",
           lang: "bash",
-          title: "Install and prepare the shared folder",
-          x: "# Install Samba server packages\nsudo apt update && sudo apt install -y samba samba-common-bin\n\n# Create the shared directory\nsudo mkdir -p /srv/shared\n\n# Create a group for all file server users\nsudo groupadd office\n\n# Set ownership and permissions\n# root owns it, 'office' group has read/write, others get nothing\nsudo chown root:office /srv/shared\nsudo chmod 2770 /srv/shared\n# The '2' (setgid bit) makes all NEW files inside inherit the 'office' group\n\n# Enable Samba and NetBIOS services at boot\nsudo systemctl enable smbd nmbd\nsudo systemctl start smbd nmbd\n\n# Verify both services are running\nsudo systemctl status smbd --no-pager"
+          title: "Update system and install Samba",
+          x: "# Update package lists and upgrade the system\nsudo apt update && sudo apt upgrade -y\n\n# Install the Samba server and client tools\nsudo apt install samba smbclient samba-common-bin -y"
         },
-        { t: "h", x: "Define the Share in smb.conf" },
-        {
-          t: "code",
-          lang: "bash",
-          title: "Back up original config and add share definition",
-          x: "# Always backup before editing Samba config\nsudo cp /etc/samba/smb.conf /etc/samba/smb.conf.original\n\n# Append the share definition at the bottom of smb.conf\nsudo tee -a /etc/samba/smb.conf << 'EOF'\n\n[shared]\n   comment = Office Shared Folder\n   path = /srv/shared\n   browseable = yes\n   read only = no\n   guest ok = no\n   valid users = @office\n   create mask = 0660\n   directory mask = 0770\n   force group = office\nEOF\n\n# Validate the configuration (should show no errors)\ntestparm --suppress-prompt"
-        },
-        { t: "h", x: "Add Samba User Accounts" },
-        {
-          t: "code",
-          lang: "bash",
-          title: "Create Linux user and set Samba password",
-          x: "# IMPORTANT: Samba has its OWN separate password database\n# A Linux system account must exist, THEN you add it to Samba\n\n# Create the Linux system account (no login shell, no home directory)\nsudo useradd -M -s /usr/sbin/nologin alice\nsudo useradd -M -s /usr/sbin/nologin bob\n\n# Add both users to the 'office' group\nsudo usermod -aG office alice\nsudo usermod -aG office bob\n\n# Set Samba passwords (can differ from Linux password)\nsudo smbpasswd -a alice  # Prompts for Samba password\nsudo smbpasswd -a bob\n\n# Enable the Samba accounts\nsudo smbpasswd -e alice\nsudo smbpasswd -e bob\n\n# Reload Samba to apply all changes\nsudo systemctl reload smbd"
-        },
-        { t: "tip", x: "The `valid users = @office` directive in smb.conf uses the `@` prefix to mean 'Linux group named office'. This is more maintainable than listing individual usernames — simply add new users to the `office` group and they immediately gain access without editing smb.conf." },
-        { t: "warn", x: "Adding a Linux account (`useradd`) does NOT automatically give Samba access. You must run `smbpasswd -a <username>` separately for each user. This is a very common mistake when setting up Samba for the first time." }
+        { t: "tip", x: "After installation, you can verify it with `smbd --version`." }
       ]
     },
     {
-      id: "connecting-clients",
-      title: "Step 2: Connect Clients from Windows, macOS, and Linux",
+      id: "share-directory-user",
+      title: "Step 2: Create the share directory and a system user",
       min: 8,
-      sum: "Mount the Samba share from Windows Explorer, macOS Finder, and Linux command line. Configure firewall rules and troubleshoot common connection issues.",
+      sum: "Create the shared folder, add a dedicated system user for Samba authentication, and set secure permissions.",
       blocks: [
-        { t: "p", x: "Once the Samba share is configured and users are added, clients can connect using their native OS tools. The server IP in the examples below is `192.168.1.10`." },
-        { t: "h", x: "Connect from Windows" },
+        { t: "p", x: "Create the folder to be shared, and create a dedicated system user (this user will be used for Samba authentication later)." },
         {
           t: "code",
           lang: "bash",
-          title: "Windows — Map network drive via CMD or File Explorer",
-          x: "# Method 1: Command Prompt — map as drive letter Z:\nnet use Z: \\\\192.168.1.10\\shared /user:alice /persistent:yes\n\n# Method 2: Windows File Explorer\n# Press Win+R, type: \\\\192.168.1.10\\shared\n# Enter username: alice\n# Enter password: (the Samba password you set)\n\n# To disconnect\nnet use Z: /delete"
+          title: "Create share directory, user, and permissions",
+          x: "# Create the share directory\nsudo mkdir -p /srv/fileshare\n\n# Create a system user (e.g., fileserveruser) and set a password\nsudo useradd -m fileserveruser\nsudo passwd fileserveruser\n\n# Set permissions: only the owner and group have read/write/execute\nsudo chown -R fileserveruser:fileserveruser /srv/fileshare\nsudo chmod -R 770 /srv/fileshare"
         },
-        { t: "h", x: "Connect from macOS" },
-        {
-          t: "code",
-          lang: "bash",
-          title: "macOS — Connect via Finder",
-          x: "# In Finder: Go → Connect to Server (⌘K)\n# Type: smb://192.168.1.10/shared\n# Click Connect, enter alice + Samba password\n\n# macOS Terminal — mount via command line\nmkdir -p ~/mnt/shared\nmount_smbfs //alice@192.168.1.10/shared ~/mnt/shared"
-        },
-        { t: "h", x: "Connect from Linux (cifs-utils)" },
-        {
-          t: "code",
-          lang: "bash",
-          title: "Linux — Mount Samba share with credentials file",
-          x: "# Install CIFS utilities\nsudo apt install -y cifs-utils\n\n# Create a secure credentials file (not in /tmp!)\nsudo tee /etc/samba-credentials-alice << 'EOF'\nusername=alice\npassword=YourSambaPassword\ndomain=WORKGROUP\nEOF\nsudo chmod 600 /etc/samba-credentials-alice\n\n# Mount manually\nsudo mkdir -p /mnt/office-shared\nsudo mount -t cifs //192.168.1.10/shared /mnt/office-shared \\\n  -o credentials=/etc/samba-credentials-alice,uid=1000,gid=1000,iocharset=utf8\n\n# Mount automatically at boot — add to /etc/fstab:\n//192.168.1.10/shared  /mnt/office-shared  cifs  credentials=/etc/samba-credentials-alice,uid=1000,gid=1000,_netdev  0  0"
-        },
-        { t: "h", x: "Configure UFW Firewall for LAN-Only Access" },
-        {
-          t: "code",
-          lang: "bash",
-          title: "Restrict Samba ports to your LAN subnet",
-          x: "# Allow Samba from LAN only (change 192.168.1.0/24 to your subnet)\nsudo ufw allow from 192.168.1.0/24 to any port 445 proto tcp comment 'Samba SMB'\nsudo ufw allow from 192.168.1.0/24 to any port 139 proto tcp comment 'Samba NetBIOS'\nsudo ufw allow from 192.168.1.0/24 to any port 137 proto udp comment 'Samba NBT'\nsudo ufw allow from 192.168.1.0/24 to any port 138 proto udp comment 'Samba NBT'\nsudo ufw status numbered"
-        },
-        { t: "tip", x: "If Windows cannot find the server by name (e.g., `\\\\fileserver\\shared`), try connecting by IP address (`\\\\192.168.1.10\\shared`) instead. NetBIOS name resolution often fails across VLANs or when the server is on a different subnet." }
+        { t: "tip", x: "Here, `770` permissions mean that users other than the owner and group have no access, which is safer than open sharing." }
       ]
     },
     {
-      id: "nfs-export",
-      title: "Step 3: Set Up NFS for High-Speed Linux-to-Linux Sharing",
-      min: 12,
-      sum: "Configure NFS exports on the server, specify per-client access options, mount shares on Linux clients, and set up automounting for reliability.",
+      id: "samba-config",
+      title: "Step 3: Edit the Samba configuration file",
+      min: 8,
+      sum: "Back up smb.conf, create a custom share definition for /srv/fileshare, and allow access for fileserveruser.",
       blocks: [
-        { t: "p", x: "NFS provides higher throughput than Samba for Linux-to-Linux transfers because it avoids the SMB protocol overhead. It is the preferred choice for mounting storage on CI/CD agents, backup servers, and Docker nodes." },
-        { t: "h", x: "Install and Configure NFS Server" },
+        { t: "p", x: "Back up the original configuration file first, then edit it with `nano`." },
         {
           t: "code",
           lang: "bash",
-          title: "Install NFS server packages and create export directory",
-          x: "# Install NFS server\nsudo apt update && sudo apt install -y nfs-kernel-server\n\n# Create an NFS export directory (can be same as Samba or separate)\nsudo mkdir -p /srv/nfs-export\nsudo chown nobody:nogroup /srv/nfs-export\nsudo chmod 0775 /srv/nfs-export\n\n# Enable NFS server at boot\nsudo systemctl enable nfs-kernel-server"
+          title: "Back up and edit smb.conf",
+          x: "sudo cp /etc/samba/smb.conf /etc/samba/smb.conf.bak\nsudo nano /etc/samba/smb.conf"
         },
-        { t: "h", x: "Define Exports in /etc/exports" },
+        { t: "p", x: "Scroll to the very end of the file and add the following content (a custom shared folder):" },
+        {
+          t: "code",
+          lang: "ini",
+          title: "/etc/samba/smb.conf — custom share",
+          x: "[Fileshare]\n   path = /srv/fileshare\n   browseable = yes\n   writable = yes\n   valid users = fileserveruser\n   create mask = 0660\n   directory mask = 0770"
+        },
+        { t: "tip", x: "`valid users` specifies which users are allowed access, and `writable = yes` allows write operations." }
+      ]
+    },
+    {
+      id: "samba-password-restart",
+      title: "Step 4: Set the Samba password and restart the service",
+      min: 6,
+      sum: "Set the Samba password for fileserveruser, restart smbd, and optionally enable it on boot.",
+      blocks: [
+        { t: "p", x: "The Samba password is separate from the Linux system password, so it must be set independently." },
         {
           t: "code",
           lang: "bash",
-          title: "/etc/exports — NFS access control rules",
-          x: "# Add to /etc/exports:\n# Format: /path  client(options)\n\n# Allow entire LAN (192.168.1.0/24) with read-write access\n/srv/nfs-export  192.168.1.0/24(rw,sync,no_subtree_check)\n\n# Restrict to a SPECIFIC trusted server only (e.g., backup server)\n/srv/nfs-export  192.168.1.25(rw,sync,no_subtree_check,no_root_squash)\n\n# Export read-only to a CI/CD agent\n/srv/nfs-export  192.168.1.50(ro,sync,no_subtree_check)\n\n# Apply the exports without restarting the server\nsudo exportfs -a\n\n# Verify active exports\nsudo exportfs -v"
+          title: "Set Samba password and restart service",
+          x: "# Set the Samba password for fileserveruser (the next two inputs are the password)\nsudo smbpasswd -a fileserveruser\n\n# Restart the Samba service to apply the configuration\nsudo systemctl restart smbd\n\n# (Optional) Enable auto-start on boot\nsudo systemctl enable smbd"
         },
-        {
-          t: "code",
-          lang: "bash",
-          title: "Start NFS server and open firewall",
-          x: "sudo systemctl restart nfs-kernel-server\nsudo systemctl status nfs-kernel-server --no-pager\n\n# Open NFS port only to LAN\nsudo ufw allow from 192.168.1.0/24 to any port 2049 proto tcp comment 'NFS'\nsudo ufw allow from 192.168.1.0/24 to any port 2049 proto udp comment 'NFS'\nsudo ufw allow from 192.168.1.0/24 to any port 111 proto tcp comment 'RPC portmapper'"
-        },
-        { t: "h", x: "Mount NFS Share on a Linux Client" },
-        {
-          t: "code",
-          lang: "bash",
-          title: "Manual mount and /etc/fstab automount",
-          x: "# Install NFS client tools on the client machine\nsudo apt install -y nfs-common\n\n# List available exports from the server\nshowmount -e 192.168.1.10\n\n# Mount manually\nsudo mkdir -p /mnt/nfs-storage\nsudo mount -t nfs 192.168.1.10:/srv/nfs-export /mnt/nfs-storage\n\n# Verify mount and test write speed\ndf -h | grep nfs\ndd if=/dev/zero of=/mnt/nfs-storage/testfile bs=1M count=512 oflag=direct\n\n# Persistent automount — add to /etc/fstab:\n192.168.1.10:/srv/nfs-export  /mnt/nfs-storage  nfs  defaults,_netdev,rw,timeo=14  0  0"
-        },
-        { t: "tip", x: "The `no_root_squash` option grants the NFS client's root user full root permissions on the export. Use this ONLY for trusted backup or admin servers. For most clients, the default `root_squash` (maps root to `nobody`) is safer." },
-        { t: "warn", x: "NFS has **no built-in encryption** — data travels in plaintext over the network. For sensitive data, either use NFS over a VPN (WireGuard/OpenVPN) or use Samba with Kerberos authentication and SMB encryption enabled." }
+        { t: "warn", x: "Creating a Linux user with `useradd`/`passwd` does not automatically grant Samba access. You must run `sudo smbpasswd -a fileserveruser` for Samba authentication." }
       ]
     }
   ]
